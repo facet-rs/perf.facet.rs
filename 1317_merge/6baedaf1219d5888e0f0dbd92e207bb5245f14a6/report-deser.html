@@ -1,0 +1,1535 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>facet-json deserialization benchmarks</title><style>
+/* Facet Benchmark Report — sober mono theme (light/dark via light-dark()) */
+
+@font-face {
+  font-family: 'Iosevka FTL';
+  src: url('IosevkaFtl-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Iosevka FTL';
+  src: url('IosevkaFtl-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  color-scheme: light dark;
+
+  --mono: 'Iosevka FTL', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+
+  /* Surfaces */
+  --bg:     light-dark(#fbfbfc, #0b0e14);
+  --panel:  light-dark(#ffffff, #0f1420);
+  --panel2: light-dark(#f6f7f9, #0c111b);
+
+  /* Text */
+  --text:  light-dark(#0e1116, #e7eaf0);
+  --muted: light-dark(#3a4556, #a3adbd);
+  --faint: light-dark(#66738a, #77839a);
+
+  /* Lines */
+  --border:  light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.08));
+  --border2: light-dark(rgba(0,0,0,0.14), rgba(255,255,255,0.14));
+
+  /* Semantic */
+  --accent: light-dark(#2457f5, #7aa2f7);
+  --good:   light-dark(#1a7f37, #7ee787);
+  --warn:   light-dark(#9a6700, #f2cc60);
+  --bad:    light-dark(#cf222e, #ff7b72);
+
+  /* Neutrals for charts */
+  --chart:  light-dark(#223047, #a3b2cc);
+  --chart-fade: light-dark(rgba(34,48,71,0.25), rgba(163,178,204,0.20));
+
+  /* Sizing */
+  --w: 1120px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 32px;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  text-rendering: geometricPrecision;
+}
+
+.container {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+/* Header */
+header {
+  background: transparent;
+  color: inherit;
+  padding: 0 0 var(--s4);
+  border-radius: 0;
+  margin-bottom: var(--s5);
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--s2);
+}
+
+.header-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+.mode-toggle {
+  font-size: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 4px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mode-toggle:hover {
+  background: var(--accent);
+  color: var(--panel);
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.meta-item { margin-right: 0; }
+.meta strong { color: var(--text); font-weight: 650; }
+
+/* Section headers */
+.section-header {
+  background: transparent;
+  padding: var(--s5) 0 var(--s2);
+  border-radius: 0;
+  margin: var(--s6) 0 var(--s2);
+  border-left: none;
+  border-top: 1px solid var(--border);
+}
+
+h2 {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 650;
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+}
+
+h3 {
+  color: var(--muted);
+  margin: 0 0 var(--s3);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+/* Panels */
+.benchmark-item,
+.summary-chart,
+.legend {
+  background: var(--panel);
+  padding: var(--s4);
+  margin: var(--s4) 0;
+  border: 1px solid var(--border);
+}
+
+/* Legend */
+.legend h3 { color: var(--text); margin-bottom: var(--s2); }
+.legend-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 10px 4px 0;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.legend-item strong { color: var(--text); font-weight: 650; }
+
+/* Table/chart layout */
+.table-chart-container {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--s5);
+  margin-top: var(--s3);
+}
+@media (max-width: 1100px) {
+  .table-chart-container { grid-template-columns: 1fr; }
+}
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+
+th, td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+th {
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  font-weight: 650;
+  font-size: 12px;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(6px);
+}
+
+td { font-size: 13px; }
+
+.metric { font-family: var(--mono); font-size: 13px; color: var(--text); }
+
+td.num, th.num { text-align: right; white-space: nowrap; }
+
+tbody tr:hover {
+  background: color-mix(in srgb, var(--panel2) 75%, transparent) !important;
+  cursor: default;
+  transition: background 0.12s;
+}
+
+tr.dimmed { opacity: 0.25; transition: opacity 0.12s; }
+
+/* Row semantics (subtle, no paint buckets) */
+.fastest,
+.jit-highlight,
+.baseline {
+  background: transparent;
+  font-weight: 650;
+  border-left: 0;
+}
+
+.fastest td:first-child {
+  border-left: 3px solid var(--good);
+  padding-left: 9px;
+}
+.baseline td:first-child {
+  border-left: 3px solid var(--muted);
+  padding-left: 9px;
+}
+.jit-highlight td:first-child {
+  border-left: 3px solid var(--accent);
+  padding-left: 9px;
+}
+
+/* Baseline gets a stronger separator */
+tr.baseline td { border-top: 1px solid var(--border2); }
+
+/* Errored rows */
+tr.errored {
+  opacity: 0.5;
+}
+tr.errored td:first-child {
+  border-left: 3px solid var(--bad);
+  padding-left: 9px;
+}
+td.error {
+  color: var(--bad);
+  font-style: italic;
+}
+
+/* Speed indicators: not color-only */
+.speedup, .neutral, .slowdown { font-weight: 650; }
+.speedup { color: var(--good); }
+.neutral { color: var(--muted); }
+.slowdown { color: var(--bad); }
+
+/* Text labels for speed indicators */
+.k { color: var(--muted); font-weight: 500; font-size: 12px; margin-left: 6px; }
+
+/* Chart wrapper */
+.chart-wrapper {
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel2);
+}
+
+/* Summary chart */
+.summary-chart h2 {
+  margin: 0 0 var(--s3) 0;
+  border-bottom: none;
+}
+
+.summary-chart-wrapper {
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel2);
+}
+
+/* Observable Plot SVG styling - inherits from CSS vars */
+.chart-wrapper svg,
+.summary-chart-wrapper svg {
+  display: block;
+  font-family: var(--mono);
+  overflow: visible;
+}
+
+/* Axis text */
+.chart-wrapper [aria-label="y-axis tick label"],
+.chart-wrapper [aria-label="x-axis tick label"],
+.summary-chart-wrapper [aria-label="y-axis tick label"],
+.summary-chart-wrapper [aria-label="x-axis tick label"] {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+/* Axis lines */
+.chart-wrapper [aria-label="y-axis tick"],
+.chart-wrapper [aria-label="x-axis tick"],
+.summary-chart-wrapper [aria-label="y-axis tick"],
+.summary-chart-wrapper [aria-label="x-axis tick"] {
+  stroke: var(--border);
+}
+
+/* Grid lines */
+.chart-wrapper g[aria-label="x-axis grid"] line,
+.summary-chart-wrapper g[aria-label="x-axis grid"] line,
+.summary-chart-wrapper g[aria-label="y-axis grid"] line {
+  stroke: var(--border);
+}
+
+/* Bar styling for individual benchmark charts */
+.chart-wrapper rect {
+  fill: var(--chart-fade);
+  stroke: var(--chart);
+  stroke-width: 1;
+  transition: fill 0.15s, stroke 0.15s, opacity 0.15s;
+}
+
+/* Highlighted bar */
+.chart-wrapper rect.highlighted {
+  fill: var(--accent);
+  fill-opacity: 0.6;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+/* Dimmed bars */
+.chart-wrapper rect.dimmed {
+  opacity: 0.3;
+}
+
+/* Summary chart - don't override Plot's colors, just add transitions */
+.summary-chart-wrapper rect {
+  transition: opacity 0.15s;
+}
+
+/* Axis labels */
+.chart-wrapper text[aria-label="x-axis label"],
+.summary-chart-wrapper text[aria-label="y-axis label"] {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+/* Footer */
+footer {
+  text-align: left;
+  margin-top: 40px;
+  padding-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: var(--s3);
+  z-index: 100;
+  font-size: 12px;
+}
+
+.sidebar-header {
+  font-weight: 650;
+  color: var(--text);
+  padding: var(--s2) var(--s2) var(--s3);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--s3);
+}
+
+.operation-switcher {
+  display: flex;
+  gap: var(--s1);
+  margin-top: var(--s2);
+  padding: var(--s1);
+  background: var(--panel2);
+  border-radius: 4px;
+}
+
+.op-link {
+  flex: 1;
+  text-align: center;
+  padding: var(--s1) var(--s2);
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+  cursor: pointer;
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+}
+
+.op-link:hover:not(.active) {
+  background: var(--panel);
+  color: var(--text);
+}
+
+.op-link.active {
+  background: var(--accent);
+  color: white;
+  cursor: default;
+}
+
+.sidebar-section {
+  margin-bottom: var(--s3);
+}
+
+.sidebar-category {
+  display: block;
+  padding: var(--s1) var(--s2);
+  color: var(--text);
+  font-weight: 650;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.sidebar-category:hover {
+  background: var(--panel2);
+}
+
+.sidebar-category.active {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.sidebar-benchmarks {
+  padding-left: var(--s3);
+  margin-top: var(--s1);
+}
+
+.sidebar-benchmark {
+  display: block;
+  padding: 3px var(--s2);
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-benchmark:hover {
+  background: var(--panel2);
+  color: var(--text);
+}
+
+.sidebar-benchmark.active {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+/* Adjust container for sidebar */
+body {
+  padding-left: 220px;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+  body {
+    padding-left: 0;
+  }
+}
+            </style><script type="module">
+import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+window.Plot = Plot;
+window.dispatchEvent(new Event('plot-ready'));
+                    </script><script src="/nav.js" defer></script></head><body><nav class="sidebar" id="sidebar"><div class="sidebar-header">Navigation<div class="operation-switcher"><span class="op-link active">Deser</span><a class="op-link" href="report-ser.html">Ser</a></div></div><div class="sidebar-section" data-section="section-micro"><a class="sidebar-category" href="#section-micro">Micro Benchmarks</a><div class="sidebar-benchmarks"><a class="sidebar-benchmark" href="#bench-simple_struct_deser" data-bench="bench-simple_struct_deser">simple struct</a><a class="sidebar-benchmark" href="#bench-simple_with_options_deser" data-bench="bench-simple_with_options_deser">simple with options</a><a class="sidebar-benchmark" href="#bench-single_nested_struct_deser" data-bench="bench-single_nested_struct_deser">single nested struct</a></div></div><div class="sidebar-section" data-section="section-synthetic"><a class="sidebar-category" href="#section-synthetic">Synthetic Benchmarks</a><div class="sidebar-benchmarks"><a class="sidebar-benchmark" href="#bench-booleans_deser" data-bench="bench-booleans_deser">booleans</a><a class="sidebar-benchmark" href="#bench-escaped_strings_deser" data-bench="bench-escaped_strings_deser">escaped strings</a><a class="sidebar-benchmark" href="#bench-flatten_2enums_deser" data-bench="bench-flatten_2enums_deser">flatten 2enums</a><a class="sidebar-benchmark" href="#bench-flatten_4enums_deser" data-bench="bench-flatten_4enums_deser">flatten 4enums</a><a class="sidebar-benchmark" href="#bench-floats_deser" data-bench="bench-floats_deser">floats</a><a class="sidebar-benchmark" href="#bench-hashmaps_deser" data-bench="bench-hashmaps_deser">hashmaps</a><a class="sidebar-benchmark" href="#bench-integers_deser" data-bench="bench-integers_deser">integers</a><a class="sidebar-benchmark" href="#bench-long_strings_deser" data-bench="bench-long_strings_deser">long strings</a><a class="sidebar-benchmark" href="#bench-nested_structs_deser" data-bench="bench-nested_structs_deser">nested structs</a><a class="sidebar-benchmark" href="#bench-options_deser" data-bench="bench-options_deser">options</a><a class="sidebar-benchmark" href="#bench-short_strings_deser" data-bench="bench-short_strings_deser">short strings</a></div></div><div class="sidebar-section" data-section="section-realistic"><a class="sidebar-category" href="#section-realistic">Realistic Benchmarks</a><div class="sidebar-benchmarks"><a class="sidebar-benchmark" href="#bench-canada_deser" data-bench="bench-canada_deser">canada</a><a class="sidebar-benchmark" href="#bench-citm_catalog_deser" data-bench="bench-citm_catalog_deser">citm catalog</a><a class="sidebar-benchmark" href="#bench-twitter_deser" data-bench="bench-twitter_deser">twitter</a></div></div></nav><div class="container"><header><div class="header-row"><h1>facet-json deserialization benchmarks</h1><a class="mode-toggle" href="report-ser.html">→ Serialization</a></div><div class="meta"><span class="meta-item"><strong>Generated: </strong>2025-12-16 17:08:30</span><span class="meta-item"><strong>Commit: </strong><a href="https://github.com/facet-rs/facet/commit/6baedaf1" target="_blank">6baedaf1</a></span><span class="meta-item"><strong>Branch: </strong><a href="https://github.com/facet-rs/facet/tree/" target="_blank"></a></span></div></header><div class="summary-chart"><h2>Micro Benchmarks: facet-format+jit vs serde_json</h2><div class="summary-chart-wrapper" id="summary-chart-micro"></div><script>
+(function() {
+    function render() {
+        const data = [{"benchmark":"simple struct","target":"facet-format+jit","time":0.7197},{"benchmark":"simple struct","target":"serde_json","time":0.1062},{"benchmark":"simple with options","target":"facet-format+jit","time":0.9897},{"benchmark":"simple with options","target":"serde_json","time":0.1359},{"benchmark":"single nested struct","target":"facet-format+jit","time":1.029},{"benchmark":"single nested struct","target":"serde_json","time":0.1459}];
+        const container = document.getElementById('summary-chart-micro');
+        const width = container.clientWidth || 600;
+
+        // Detect dark mode for color selection
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const accentColor = isDark ? '#7aa2f7' : '#2457f5';
+        const mutedColor = isDark ? '#6b7280' : '#9ca3af';
+
+        const chart = Plot.plot({
+            width: width,
+            height: Math.max(200, data.length * 20 + 60),
+            marginLeft: 140,
+            marginRight: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            color: {
+                domain: ["facet-format+jit","serde_json"],
+                range: [accentColor, mutedColor],
+                legend: true
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "benchmark",
+                    fill: "target",
+                    sort: { y: "-x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="summary-chart"><h2>Synthetic Benchmarks: facet-format+jit vs serde_json</h2><div class="summary-chart-wrapper" id="summary-chart-synthetic"></div><script>
+(function() {
+    function render() {
+        const data = [{"benchmark":"booleans","target":"facet-format+jit","time":3107},{"benchmark":"booleans","target":"serde_json","time":57.29},{"benchmark":"escaped strings","target":"facet-format+jit","time":523.4},{"benchmark":"escaped strings","target":"serde_json","time":95.88},{"benchmark":"flatten 2enums","target":"facet-format+jit","time":11370},{"benchmark":"flatten 2enums","target":"serde_json","time":490.9},{"benchmark":"flatten 4enums","target":"facet-format+jit","time":43530},{"benchmark":"flatten 4enums","target":"serde_json","time":939},{"benchmark":"floats","target":"facet-format+jit","time":358.1},{"benchmark":"floats","target":"serde_json","time":23.19},{"benchmark":"hashmaps","target":"facet-format+jit","time":661.2},{"benchmark":"hashmaps","target":"serde_json","time":94.73},{"benchmark":"integers","target":"facet-format+jit","time":387.6},{"benchmark":"integers","target":"serde_json","time":19.24},{"benchmark":"long strings","target":"facet-format+jit","time":310.1},{"benchmark":"long strings","target":"serde_json","time":21.21},{"benchmark":"nested structs","target":"facet-format+jit","time":1448},{"benchmark":"nested structs","target":"serde_json","time":111},{"benchmark":"options","target":"facet-format+jit","time":688.2},{"benchmark":"options","target":"serde_json","time":36.57},{"benchmark":"short strings","target":"facet-format+jit","time":335.9},{"benchmark":"short strings","target":"serde_json","time":25.07}];
+        const container = document.getElementById('summary-chart-synthetic');
+        const width = container.clientWidth || 600;
+
+        // Detect dark mode for color selection
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const accentColor = isDark ? '#7aa2f7' : '#2457f5';
+        const mutedColor = isDark ? '#6b7280' : '#9ca3af';
+
+        const chart = Plot.plot({
+            width: width,
+            height: Math.max(200, data.length * 20 + 60),
+            marginLeft: 140,
+            marginRight: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            color: {
+                domain: ["facet-format+jit","serde_json"],
+                range: [accentColor, mutedColor],
+                legend: true
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "benchmark",
+                    fill: "target",
+                    sort: { y: "-x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="summary-chart"><h2>Realistic Benchmarks: facet-format+jit vs serde_json</h2><div class="summary-chart-wrapper" id="summary-chart-realistic"></div><script>
+(function() {
+    function render() {
+        const data = [{"benchmark":"canada","target":"serde_json","time":4871},{"benchmark":"citm catalog","target":"serde_json","time":1818},{"benchmark":"twitter","target":"serde_json","time":430.4}];
+        const container = document.getElementById('summary-chart-realistic');
+        const width = container.clientWidth || 600;
+
+        // Detect dark mode for color selection
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const accentColor = isDark ? '#7aa2f7' : '#2457f5';
+        const mutedColor = isDark ? '#6b7280' : '#9ca3af';
+
+        const chart = Plot.plot({
+            width: width,
+            height: Math.max(200, data.length * 20 + 60),
+            marginLeft: 140,
+            marginRight: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            color: {
+                domain: ["facet-format+jit","serde_json"],
+                range: [accentColor, mutedColor],
+                legend: true
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "benchmark",
+                    fill: "target",
+                    sort: { y: "-x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="legend"><h3>Targets</h3><div><span class="legend-item"><strong>facet-format+jit</strong> — Format-agnostic JIT (our work!)</span><span class="legend-item"><strong>facet-json+jit</strong> — JSON-specific JIT</span><span class="legend-item"><strong>facet-format</strong> — Format-agnostic, no JIT</span><span class="legend-item"><strong>facet-json</strong> — JSON-specific, no JIT</span><span class="legend-item"><strong>serde_json</strong> — The baseline to beat</span></div></div><div class="section-header" id="section-micro"><h2>Micro Benchmarks</h2></div><div class="benchmark-item" id="bench-simple_struct_deser" data-operation="deserialize"><h3>simple struct — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-simple_struct_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('simple_struct_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('simple_struct_deser')"><td>facet-json+jit</td><td class="metric num">79.7 ns</td><td class="metric num">1.05K</td><td class="num speedup"><span class="metric">0.75×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('simple_struct_deser', 'serde_json')" onmouseleave="unhighlightChart('simple_struct_deser')"><td>serde_json</td><td class="metric num">106.2 ns</td><td class="metric num">879</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('simple_struct_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('simple_struct_deser')"><td>facet-format+jit</td><td class="metric num">719.7 ns</td><td class="metric num">6.62K</td><td class="num slowdown"><span class="metric">6.78×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('simple_struct_deser', 'facet_format_json')" onmouseleave="unhighlightChart('simple_struct_deser')"><td>facet-format</td><td class="metric num">1.37 µs</td><td class="metric num">5.25K</td><td class="num slowdown"><span class="metric">12.89×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('simple_struct_deser', 'facet_json')" onmouseleave="unhighlightChart('simple_struct_deser')"><td>facet-json</td><td class="metric num">1.40 µs</td><td class="metric num">4.54K</td><td class="num slowdown"><span class="metric">13.22×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-simple_struct_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":0.07972},{"target":"serde_json","label":"serde_json","time":0.1062},{"target":"facet_format_jit","label":"facet-format+jit","time":0.7197},{"target":"facet_format_json","label":"facet-format","time":1.369},{"target":"facet_json","label":"facet-json","time":1.404}];
+        const container = document.getElementById('chart-simple_struct_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-simple_with_options_deser" data-operation="deserialize"><h3>simple with options — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-simple_with_options_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('simple_with_options_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('simple_with_options_deser')"><td>facet-json+jit</td><td class="metric num">129.7 ns</td><td class="metric num">1.98K</td><td class="num speedup"><span class="metric">0.95×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('simple_with_options_deser', 'serde_json')" onmouseleave="unhighlightChart('simple_with_options_deser')"><td>serde_json</td><td class="metric num">135.9 ns</td><td class="metric num">2.00K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('simple_with_options_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('simple_with_options_deser')"><td>facet-format+jit</td><td class="metric num">989.7 ns</td><td class="metric num">9.52K</td><td class="num slowdown"><span class="metric">7.28×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('simple_with_options_deser', 'facet_format_json')" onmouseleave="unhighlightChart('simple_with_options_deser')"><td>facet-format</td><td class="metric num">2.25 µs</td><td class="metric num">7.52K</td><td class="num slowdown"><span class="metric">16.55×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('simple_with_options_deser', 'facet_json')" onmouseleave="unhighlightChart('simple_with_options_deser')"><td>facet-json</td><td class="metric num">2.38 µs</td><td class="metric num">6.94K</td><td class="num slowdown"><span class="metric">17.54×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-simple_with_options_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":0.12969999999999998},{"target":"serde_json","label":"serde_json","time":0.1359},{"target":"facet_format_jit","label":"facet-format+jit","time":0.9897},{"target":"facet_format_json","label":"facet-format","time":2.249},{"target":"facet_json","label":"facet-json","time":2.384}];
+        const container = document.getElementById('chart-simple_with_options_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-single_nested_struct_deser" data-operation="deserialize"><h3>single nested struct — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-single_nested_struct_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('single_nested_struct_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('single_nested_struct_deser')"><td>facet-json+jit</td><td class="metric num">109.7 ns</td><td class="metric num">1.54K</td><td class="num speedup"><span class="metric">0.75×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('single_nested_struct_deser', 'serde_json')" onmouseleave="unhighlightChart('single_nested_struct_deser')"><td>serde_json</td><td class="metric num">145.9 ns</td><td class="metric num">1.23K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('single_nested_struct_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('single_nested_struct_deser')"><td>facet-format+jit</td><td class="metric num">1.03 µs</td><td class="metric num">9.44K</td><td class="num slowdown"><span class="metric">7.05×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('single_nested_struct_deser', 'facet_format_json')" onmouseleave="unhighlightChart('single_nested_struct_deser')"><td>facet-format</td><td class="metric num">2.08 µs</td><td class="metric num">7.51K</td><td class="num slowdown"><span class="metric">14.25×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('single_nested_struct_deser', 'facet_json')" onmouseleave="unhighlightChart('single_nested_struct_deser')"><td>facet-json</td><td class="metric num">2.26 µs</td><td class="metric num">6.58K</td><td class="num slowdown"><span class="metric">15.48×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-single_nested_struct_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":0.1097},{"target":"serde_json","label":"serde_json","time":0.1459},{"target":"facet_format_jit","label":"facet-format+jit","time":1.029},{"target":"facet_format_json","label":"facet-format","time":2.079},{"target":"facet_json","label":"facet-json","time":2.259}];
+        const container = document.getElementById('chart-single_nested_struct_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="section-header" id="section-synthetic"><h2>Synthetic Benchmarks</h2></div><div class="benchmark-item" id="bench-booleans_deser" data-operation="deserialize"><h3>booleans — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-booleans_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('booleans_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('booleans_deser')"><td>facet-json+jit</td><td class="metric num">17.15 µs</td><td class="metric num">427.94K</td><td class="num speedup"><span class="metric">0.30×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('booleans_deser', 'serde_json')" onmouseleave="unhighlightChart('booleans_deser')"><td>serde_json</td><td class="metric num">57.29 µs</td><td class="metric num">207.58K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('booleans_deser', 'facet_json')" onmouseleave="unhighlightChart('booleans_deser')"><td>facet-json</td><td class="metric num">2.67 ms</td><td class="metric num">3.07M</td><td class="num slowdown"><span class="metric">46.66×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('booleans_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('booleans_deser')"><td>facet-format+jit</td><td class="metric num">3.11 ms</td><td class="metric num">23.53M</td><td class="num slowdown"><span class="metric">54.23×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('booleans_deser', 'facet_format_json')" onmouseleave="unhighlightChart('booleans_deser')"><td>facet-format</td><td class="metric num">3.12 ms</td><td class="metric num">2.85M</td><td class="num slowdown"><span class="metric">54.46×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-booleans_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":17.15},{"target":"serde_json","label":"serde_json","time":57.29},{"target":"facet_json","label":"facet-json","time":2673},{"target":"facet_format_jit","label":"facet-format+jit","time":3107},{"target":"facet_format_json","label":"facet-format","time":3120}];
+        const container = document.getElementById('chart-booleans_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-escaped_strings_deser" data-operation="deserialize"><h3>escaped strings — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-escaped_strings_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('escaped_strings_deser', 'serde_json')" onmouseleave="unhighlightChart('escaped_strings_deser')"><td>serde_json</td><td class="metric num">95.88 µs</td><td class="metric num">843.46K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('escaped_strings_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('escaped_strings_deser')"><td>facet-json+jit</td><td class="metric num">106.60 µs</td><td class="metric num">1.85M</td><td class="num slowdown"><span class="metric">1.11×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('escaped_strings_deser', 'facet_json')" onmouseleave="unhighlightChart('escaped_strings_deser')"><td>facet-json</td><td class="metric num">469.90 µs</td><td class="metric num">2.67M</td><td class="num slowdown"><span class="metric">4.90×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('escaped_strings_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('escaped_strings_deser')"><td>facet-format+jit</td><td class="metric num">523.40 µs</td><td class="metric num">6.16M</td><td class="num slowdown"><span class="metric">5.46×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('escaped_strings_deser', 'facet_format_json')" onmouseleave="unhighlightChart('escaped_strings_deser')"><td>facet-format</td><td class="metric num">523.90 µs</td><td class="metric num">2.80M</td><td class="num slowdown"><span class="metric">5.46×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-escaped_strings_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":95.88},{"target":"facet_json_cranelift","label":"facet-json+jit","time":106.6},{"target":"facet_json","label":"facet-json","time":469.9},{"target":"facet_format_jit","label":"facet-format+jit","time":523.4},{"target":"facet_format_json","label":"facet-format","time":523.9}];
+        const container = document.getElementById('chart-escaped_strings_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-flatten_2enums_deser" data-operation="deserialize"><h3>flatten 2enums — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-flatten_2enums_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('flatten_2enums_deser', 'serde_json')" onmouseleave="unhighlightChart('flatten_2enums_deser')"><td>serde_json</td><td class="metric num">490.90 µs</td><td class="metric num">1.54M</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('flatten_2enums_deser', 'facet_json')" onmouseleave="unhighlightChart('flatten_2enums_deser')"><td>facet-json</td><td class="metric num">9.42 ms</td><td class="metric num">10.65M</td><td class="num slowdown"><span class="metric">19.19×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('flatten_2enums_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('flatten_2enums_deser')"><td>facet-json+jit</td><td class="metric num">9.47 ms</td><td class="metric num">103.27M</td><td class="num slowdown"><span class="metric">19.30×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('flatten_2enums_deser', 'facet_format_json')" onmouseleave="unhighlightChart('flatten_2enums_deser')"><td>facet-format</td><td class="metric num">11.32 ms</td><td class="metric num">10.82M</td><td class="num slowdown"><span class="metric">23.06×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('flatten_2enums_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('flatten_2enums_deser')"><td>facet-format+jit</td><td class="metric num">11.37 ms</td><td class="metric num">122.44M</td><td class="num slowdown"><span class="metric">23.16×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-flatten_2enums_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":490.9},{"target":"facet_json","label":"facet-json","time":9422},{"target":"facet_json_cranelift","label":"facet-json+jit","time":9472},{"target":"facet_format_json","label":"facet-format","time":11320},{"target":"facet_format_jit","label":"facet-format+jit","time":11370}];
+        const container = document.getElementById('chart-flatten_2enums_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-flatten_4enums_deser" data-operation="deserialize"><h3>flatten 4enums — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-flatten_4enums_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('flatten_4enums_deser', 'serde_json')" onmouseleave="unhighlightChart('flatten_4enums_deser')"><td>serde_json</td><td class="metric num">939.00 µs</td><td class="metric num">2.71M</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('flatten_4enums_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('flatten_4enums_deser')"><td>facet-json+jit</td><td class="metric num">39.78 ms</td><td class="metric num">483.29M</td><td class="num slowdown"><span class="metric">42.36×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('flatten_4enums_deser', 'facet_json')" onmouseleave="unhighlightChart('flatten_4enums_deser')"><td>facet-json</td><td class="metric num">39.81 ms</td><td class="metric num">19.06M</td><td class="num slowdown"><span class="metric">42.40×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('flatten_4enums_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('flatten_4enums_deser')"><td>facet-format+jit</td><td class="metric num">43.53 ms</td><td class="metric num">515.82M</td><td class="num slowdown"><span class="metric">46.36×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('flatten_4enums_deser', 'facet_format_json')" onmouseleave="unhighlightChart('flatten_4enums_deser')"><td>facet-format</td><td class="metric num">43.55 ms</td><td class="metric num">19.46M</td><td class="num slowdown"><span class="metric">46.38×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-flatten_4enums_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":939},{"target":"facet_json_cranelift","label":"facet-json+jit","time":39780},{"target":"facet_json","label":"facet-json","time":39810},{"target":"facet_format_jit","label":"facet-format+jit","time":43530},{"target":"facet_format_json","label":"facet-format","time":43550}];
+        const container = document.getElementById('chart-flatten_4enums_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-floats_deser" data-operation="deserialize"><h3>floats — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-floats_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('floats_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('floats_deser')"><td>facet-json+jit</td><td class="metric num">23.03 µs</td><td class="metric num">409.84K</td><td class="num speedup"><span class="metric">0.99×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('floats_deser', 'serde_json')" onmouseleave="unhighlightChart('floats_deser')"><td>serde_json</td><td class="metric num">23.19 µs</td><td class="metric num">412.56K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('floats_deser', 'facet_json')" onmouseleave="unhighlightChart('floats_deser')"><td>facet-json</td><td class="metric num">350.50 µs</td><td class="metric num">654.67K</td><td class="num slowdown"><span class="metric">15.11×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('floats_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('floats_deser')"><td>facet-format+jit</td><td class="metric num">358.10 µs</td><td class="metric num">3.02M</td><td class="num slowdown"><span class="metric">15.44×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('floats_deser', 'facet_format_json')" onmouseleave="unhighlightChart('floats_deser')"><td>facet-format</td><td class="metric num">361.80 µs</td><td class="metric num">663.90K</td><td class="num slowdown"><span class="metric">15.60×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-floats_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":23.03},{"target":"serde_json","label":"serde_json","time":23.19},{"target":"facet_json","label":"facet-json","time":350.5},{"target":"facet_format_jit","label":"facet-format+jit","time":358.1},{"target":"facet_format_json","label":"facet-format","time":361.8}];
+        const container = document.getElementById('chart-floats_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-hashmaps_deser" data-operation="deserialize"><h3>hashmaps — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-hashmaps_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('hashmaps_deser', 'serde_json')" onmouseleave="unhighlightChart('hashmaps_deser')"><td>serde_json</td><td class="metric num">94.73 µs</td><td class="metric num">229.75K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('hashmaps_deser', 'facet_format_json')" onmouseleave="unhighlightChart('hashmaps_deser')"><td>facet-format</td><td class="metric num">656.10 µs</td><td class="metric num">854.04K</td><td class="num slowdown"><span class="metric">6.93×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('hashmaps_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('hashmaps_deser')"><td>facet-format+jit</td><td class="metric num">661.20 µs</td><td class="metric num">5.34M</td><td class="num slowdown"><span class="metric">6.98×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('hashmaps_deser', 'facet_json')" onmouseleave="unhighlightChart('hashmaps_deser')"><td>facet-json</td><td class="metric num">664.20 µs</td><td class="metric num">875.73K</td><td class="num slowdown"><span class="metric">7.01×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('hashmaps_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('hashmaps_deser')"><td>facet-json+jit</td><td class="metric num">671.10 µs</td><td class="metric num">5.43M</td><td class="num slowdown"><span class="metric">7.08×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-hashmaps_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":94.73},{"target":"facet_format_json","label":"facet-format","time":656.1},{"target":"facet_format_jit","label":"facet-format+jit","time":661.2},{"target":"facet_json","label":"facet-json","time":664.2},{"target":"facet_json_cranelift","label":"facet-json+jit","time":671.1}];
+        const container = document.getElementById('chart-hashmaps_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-integers_deser" data-operation="deserialize"><h3>integers — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-integers_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('integers_deser', 'serde_json')" onmouseleave="unhighlightChart('integers_deser')"><td>serde_json</td><td class="metric num">19.24 µs</td><td class="metric num">127.12K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('integers_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('integers_deser')"><td>facet-json+jit</td><td class="metric num">21.96 µs</td><td class="metric num">399.81K</td><td class="num slowdown"><span class="metric">1.14×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('integers_deser', 'facet_json')" onmouseleave="unhighlightChart('integers_deser')"><td>facet-json</td><td class="metric num">383.30 µs</td><td class="metric num">381.12K</td><td class="num slowdown"><span class="metric">19.92×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('integers_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('integers_deser')"><td>facet-format+jit</td><td class="metric num">387.60 µs</td><td class="metric num">3.12M</td><td class="num slowdown"><span class="metric">20.15×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('integers_deser', 'facet_format_json')" onmouseleave="unhighlightChart('integers_deser')"><td>facet-format</td><td class="metric num">391.90 µs</td><td class="metric num">368.04K</td><td class="num slowdown"><span class="metric">20.37×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-integers_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":19.24},{"target":"facet_json_cranelift","label":"facet-json+jit","time":21.96},{"target":"facet_json","label":"facet-json","time":383.3},{"target":"facet_format_jit","label":"facet-format+jit","time":387.6},{"target":"facet_format_json","label":"facet-format","time":391.9}];
+        const container = document.getElementById('chart-integers_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-long_strings_deser" data-operation="deserialize"><h3>long strings — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-long_strings_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('long_strings_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('long_strings_deser')"><td>facet-json+jit</td><td class="metric num">5.59 µs</td><td class="metric num">72.98K</td><td class="num speedup"><span class="metric">0.26×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('long_strings_deser', 'serde_json')" onmouseleave="unhighlightChart('long_strings_deser')"><td>serde_json</td><td class="metric num">21.21 µs</td><td class="metric num">925.00K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('long_strings_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('long_strings_deser')"><td>facet-format+jit</td><td class="metric num">310.10 µs</td><td class="metric num">4.88M</td><td class="num slowdown"><span class="metric">14.62×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('long_strings_deser', 'facet_format_json')" onmouseleave="unhighlightChart('long_strings_deser')"><td>facet-format</td><td class="metric num">311.00 µs</td><td class="metric num">559.55K</td><td class="num slowdown"><span class="metric">14.66×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('long_strings_deser', 'facet_json')" onmouseleave="unhighlightChart('long_strings_deser')"><td>facet-json</td><td class="metric num">406.80 µs</td><td class="metric num">546.44K</td><td class="num slowdown"><span class="metric">19.18×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-long_strings_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":5.594},{"target":"serde_json","label":"serde_json","time":21.21},{"target":"facet_format_jit","label":"facet-format+jit","time":310.1},{"target":"facet_format_json","label":"facet-format","time":311},{"target":"facet_json","label":"facet-json","time":406.8}];
+        const container = document.getElementById('chart-long_strings_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-nested_structs_deser" data-operation="deserialize"><h3>nested structs — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-nested_structs_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('nested_structs_deser', 'serde_json')" onmouseleave="unhighlightChart('nested_structs_deser')"><td>serde_json</td><td class="metric num">111.00 µs</td><td class="metric num">1.10M</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('nested_structs_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('nested_structs_deser')"><td>facet-format+jit</td><td class="metric num">1.45 ms</td><td class="metric num">12.40M</td><td class="num slowdown"><span class="metric">13.05×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('nested_structs_deser', 'facet_format_json')" onmouseleave="unhighlightChart('nested_structs_deser')"><td>facet-format</td><td class="metric num">1.45 ms</td><td class="metric num">4.40M</td><td class="num slowdown"><span class="metric">13.06×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('nested_structs_deser', 'facet_json')" onmouseleave="unhighlightChart('nested_structs_deser')"><td>facet-json</td><td class="metric num">1.47 ms</td><td class="metric num">4.03M</td><td class="num slowdown"><span class="metric">13.23×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('nested_structs_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('nested_structs_deser')"><td>facet-json+jit</td><td class="metric num">1.47 ms</td><td class="metric num">12.80M</td><td class="num slowdown"><span class="metric">13.25×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-nested_structs_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":111},{"target":"facet_format_jit","label":"facet-format+jit","time":1448},{"target":"facet_format_json","label":"facet-format","time":1450},{"target":"facet_json","label":"facet-json","time":1469},{"target":"facet_json_cranelift","label":"facet-json+jit","time":1471}];
+        const container = document.getElementById('chart-nested_structs_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-options_deser" data-operation="deserialize"><h3>options — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-options_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('options_deser', 'serde_json')" onmouseleave="unhighlightChart('options_deser')"><td>serde_json</td><td class="metric num">36.57 µs</td><td class="metric num">571.31K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('options_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('options_deser')"><td>facet-json+jit</td><td class="metric num">669.90 µs</td><td class="metric num">5.78M</td><td class="num slowdown"><span class="metric">18.32×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('options_deser', 'facet_json')" onmouseleave="unhighlightChart('options_deser')"><td>facet-json</td><td class="metric num">681.20 µs</td><td class="metric num">2.28M</td><td class="num slowdown"><span class="metric">18.63×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('options_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('options_deser')"><td>facet-format+jit</td><td class="metric num">688.20 µs</td><td class="metric num">5.76M</td><td class="num slowdown"><span class="metric">18.82×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('options_deser', 'facet_format_json')" onmouseleave="unhighlightChart('options_deser')"><td>facet-format</td><td class="metric num">689.30 µs</td><td class="metric num">2.47M</td><td class="num slowdown"><span class="metric">18.85×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-options_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":36.57},{"target":"facet_json_cranelift","label":"facet-json+jit","time":669.9},{"target":"facet_json","label":"facet-json","time":681.2},{"target":"facet_format_jit","label":"facet-format+jit","time":688.2},{"target":"facet_format_json","label":"facet-format","time":689.3}];
+        const container = document.getElementById('chart-options_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-short_strings_deser" data-operation="deserialize"><h3>short strings — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-short_strings_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('short_strings_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('short_strings_deser')"><td>facet-json+jit</td><td class="metric num">15.74 µs</td><td class="metric num">230.44K</td><td class="num speedup"><span class="metric">0.63×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('short_strings_deser', 'serde_json')" onmouseleave="unhighlightChart('short_strings_deser')"><td>serde_json</td><td class="metric num">25.07 µs</td><td class="metric num">171.10K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('short_strings_deser', 'facet_json')" onmouseleave="unhighlightChart('short_strings_deser')"><td>facet-json</td><td class="metric num">306.00 µs</td><td class="metric num">723.16K</td><td class="num slowdown"><span class="metric">12.21×</span><span class="k">slower</span></td></tr><tr class="jit-highlight" data-target="facet_format_jit" onmouseenter="highlightChart('short_strings_deser', 'facet_format_jit')" onmouseleave="unhighlightChart('short_strings_deser')"><td>facet-format+jit</td><td class="metric num">335.90 µs</td><td class="metric num">3.00M</td><td class="num slowdown"><span class="metric">13.40×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('short_strings_deser', 'facet_format_json')" onmouseleave="unhighlightChart('short_strings_deser')"><td>facet-format</td><td class="metric num">336.60 µs</td><td class="metric num">852.61K</td><td class="num slowdown"><span class="metric">13.43×</span><span class="k">slower</span></td></tr></tbody></table></div><div class="chart-wrapper" id="chart-short_strings_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":15.74},{"target":"serde_json","label":"serde_json","time":25.07},{"target":"facet_json","label":"facet-json","time":306},{"target":"facet_format_jit","label":"facet-format+jit","time":335.9},{"target":"facet_format_json","label":"facet-format","time":336.6}];
+        const container = document.getElementById('chart-short_strings_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="section-header" id="section-realistic"><h2>Realistic Benchmarks</h2></div><div class="benchmark-item" id="bench-canada_deser" data-operation="deserialize"><h3>canada — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-canada_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('canada_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('canada_deser')"><td>facet-json+jit</td><td class="metric num">3.57 ms</td><td class="metric num">71.32M</td><td class="num speedup"><span class="metric">0.73×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('canada_deser', 'serde_json')" onmouseleave="unhighlightChart('canada_deser')"><td>serde_json</td><td class="metric num">4.87 ms</td><td class="metric num">43.89M</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('canada_deser', 'facet_json')" onmouseleave="unhighlightChart('canada_deser')"><td>facet-json</td><td class="metric num">52.24 ms</td><td class="metric num">87.12M</td><td class="num slowdown"><span class="metric">10.72×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('canada_deser', 'facet_format_json')" onmouseleave="unhighlightChart('canada_deser')"><td>facet-format</td><td class="metric num">60.73 ms</td><td class="metric num">92.55M</td><td class="num slowdown"><span class="metric">12.47×</span><span class="k">slower</span></td></tr><tr class="errored" data-target="facet_format_jit"><td>facet-format+jit</td><td class="metric num error">error</td><td class="metric num">-</td><td class="num">-</td></tr></tbody></table></div><div class="chart-wrapper" id="chart-canada_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":3566},{"target":"serde_json","label":"serde_json","time":4871},{"target":"facet_json","label":"facet-json","time":52240},{"target":"facet_format_json","label":"facet-format","time":60730}];
+        const container = document.getElementById('chart-canada_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-citm_catalog_deser" data-operation="deserialize"><h3>citm catalog — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-citm_catalog_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="serde_json" onmouseenter="highlightChart('citm_catalog_deser', 'serde_json')" onmouseleave="unhighlightChart('citm_catalog_deser')"><td>serde_json</td><td class="metric num">1.82 ms</td><td class="metric num">6.98M</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('citm_catalog_deser', 'facet_json')" onmouseleave="unhighlightChart('citm_catalog_deser')"><td>facet-json</td><td class="metric num">16.33 ms</td><td class="metric num">32.79M</td><td class="num slowdown"><span class="metric">8.98×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json_cranelift" onmouseenter="highlightChart('citm_catalog_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('citm_catalog_deser')"><td>facet-json+jit</td><td class="metric num">16.65 ms</td><td class="metric num">158.27M</td><td class="num slowdown"><span class="metric">9.16×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('citm_catalog_deser', 'facet_format_json')" onmouseleave="unhighlightChart('citm_catalog_deser')"><td>facet-format</td><td class="metric num">17.13 ms</td><td class="metric num">36.65M</td><td class="num slowdown"><span class="metric">9.42×</span><span class="k">slower</span></td></tr><tr class="errored" data-target="facet_format_jit"><td>facet-format+jit</td><td class="metric num error">error</td><td class="metric num">-</td><td class="num">-</td></tr></tbody></table></div><div class="chart-wrapper" id="chart-citm_catalog_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"serde_json","label":"serde_json","time":1818},{"target":"facet_json","label":"facet-json","time":16329.999999999998},{"target":"facet_json_cranelift","label":"facet-json+jit","time":16649.999999999996},{"target":"facet_format_json","label":"facet-format","time":17130}];
+        const container = document.getElementById('chart-citm_catalog_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><div class="benchmark-item" id="bench-twitter_deser" data-operation="deserialize"><h3>twitter — Deserialize</h3><div class="table-chart-container"><div class="table-wrapper"><table id="table-twitter_deser"><thead><tr><th>Target</th><th class="num">Median Time</th><th class="num">Instructions</th><th class="num">vs serde_json</th></tr></thead><tbody><tr class="fastest" data-target="facet_json_cranelift" onmouseenter="highlightChart('twitter_deser', 'facet_json_cranelift')" onmouseleave="unhighlightChart('twitter_deser')"><td>facet-json+jit</td><td class="metric num">347.80 µs</td><td class="metric num">4.96M</td><td class="num speedup"><span class="metric">0.81×</span><span class="k">faster</span></td></tr><tr class="baseline" data-target="serde_json" onmouseenter="highlightChart('twitter_deser', 'serde_json')" onmouseleave="unhighlightChart('twitter_deser')"><td>serde_json</td><td class="metric num">430.40 µs</td><td class="metric num">539.58K</td><td class="num neutral"><span class="metric">1.00×</span></td></tr><tr class="" data-target="facet_format_json" onmouseenter="highlightChart('twitter_deser', 'facet_format_json')" onmouseleave="unhighlightChart('twitter_deser')"><td>facet-format</td><td class="metric num">2.84 ms</td><td class="metric num">2.63M</td><td class="num slowdown"><span class="metric">6.60×</span><span class="k">slower</span></td></tr><tr class="" data-target="facet_json" onmouseenter="highlightChart('twitter_deser', 'facet_json')" onmouseleave="unhighlightChart('twitter_deser')"><td>facet-json</td><td class="metric num">3.84 ms</td><td class="metric num">2.50M</td><td class="num slowdown"><span class="metric">8.91×</span><span class="k">slower</span></td></tr><tr class="errored" data-target="facet_format_jit"><td>facet-format+jit</td><td class="metric num error">error</td><td class="metric num">-</td><td class="num">-</td></tr></tbody></table></div><div class="chart-wrapper" id="chart-twitter_deser"></div></div><script>
+(function() {
+    function render() {
+        const data = [{"target":"facet_json_cranelift","label":"facet-json+jit","time":347.8},{"target":"serde_json","label":"serde_json","time":430.4},{"target":"facet_format_json","label":"facet-format","time":2839},{"target":"facet_json","label":"facet-json","time":3837}];
+        const container = document.getElementById('chart-twitter_deser');
+        const width = container.clientWidth || 400;
+        const barHeight = 28;
+
+        const chart = Plot.plot({
+            width: width,
+            height: data.length * barHeight + 50,
+            marginLeft: 130,
+            marginRight: 20,
+            marginTop: 10,
+            marginBottom: 40,
+            x: {
+                label: "Time (µs)",
+                grid: true
+            },
+            y: {
+                label: null
+            },
+            marks: [
+                Plot.barX(data, {
+                    x: "time",
+                    y: "label",
+                    sort: { y: "x" }
+                }),
+                Plot.ruleX([0])
+            ]
+        });
+
+        container.appendChild(chart);
+
+        // Add data-target attributes to bars for hover interaction
+        const bars = chart.querySelectorAll('rect');
+        data.sort((a, b) => a.time - b.time).forEach((d, i) => {
+            if (bars[i]) {
+                bars[i].setAttribute('data-target', d.target);
+            }
+        });
+    }
+    if (window.Plot) render();
+    else window.addEventListener('plot-ready', render);
+})();
+</script></div><footer><p><strong>Generated by </strong>benchmark-analyzer</p><p>Benchmark tools: divan (wall-clock) + gungraun (instruction counts)</p></footer></div><script>
+// Highlight chart bars when hovering table rows (SVG version)
+function highlightChart(benchId, targetName) {
+    const chartContainer = document.getElementById('chart-' + benchId);
+    const table = document.getElementById('table-' + benchId);
+
+    if (!chartContainer) return;
+
+    // Dim non-hovered table rows
+    if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            if (row.getAttribute('data-target') === targetName) {
+                row.classList.remove('dimmed');
+            } else {
+                row.classList.add('dimmed');
+            }
+        });
+    }
+
+    // Highlight/dim SVG bars
+    const bars = chartContainer.querySelectorAll('rect[data-target]');
+    bars.forEach(bar => {
+        if (bar.getAttribute('data-target') === targetName) {
+            bar.classList.add('highlighted');
+            bar.classList.remove('dimmed');
+        } else {
+            bar.classList.add('dimmed');
+            bar.classList.remove('highlighted');
+        }
+    });
+}
+
+function unhighlightChart(benchId) {
+    const chartContainer = document.getElementById('chart-' + benchId);
+    const table = document.getElementById('table-' + benchId);
+
+    // Reset table rows
+    if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => row.classList.remove('dimmed'));
+    }
+
+    // Reset SVG bars
+    if (chartContainer) {
+        const bars = chartContainer.querySelectorAll('rect[data-target]');
+        bars.forEach(bar => {
+            bar.classList.remove('highlighted', 'dimmed');
+        });
+    }
+}
+
+window.highlightChart = highlightChart;
+window.unhighlightChart = unhighlightChart;
+
+// Sidebar scroll highlighting
+(function() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    const sectionHeaders = document.querySelectorAll('.section-header[id]');
+    const benchmarkItems = document.querySelectorAll('.benchmark-item[id]');
+    const sidebarCategories = sidebar.querySelectorAll('.sidebar-category');
+    const sidebarBenchmarks = sidebar.querySelectorAll('.sidebar-benchmark');
+
+    // Map from element IDs to sidebar links
+    const sectionMap = new Map();
+    sidebarCategories.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            sectionMap.set(href.slice(1), link);
+        }
+    });
+
+    const benchMap = new Map();
+    sidebarBenchmarks.forEach(link => {
+        const benchId = link.getAttribute('data-bench');
+        if (benchId) {
+            benchMap.set(benchId, link);
+        }
+    });
+
+    function updateSidebarHighlight() {
+        const scrollTop = window.scrollY;
+        const viewportHeight = window.innerHeight;
+        const offset = 100; // How far from top to consider "active"
+
+        // Find active section
+        let activeSection = null;
+        sectionHeaders.forEach(header => {
+            const rect = header.getBoundingClientRect();
+            if (rect.top <= offset) {
+                activeSection = header.id;
+            }
+        });
+
+        // Find active benchmark (closest to top of viewport)
+        let activeBench = null;
+        let closestDistance = Infinity;
+        benchmarkItems.forEach(item => {
+            const rect = item.getBoundingClientRect();
+            if (rect.top <= offset && rect.bottom > 0) {
+                const distance = Math.abs(rect.top - offset);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    activeBench = item.id;
+                }
+            }
+        });
+
+        // Update sidebar highlighting
+        sidebarCategories.forEach(link => link.classList.remove('active'));
+        sidebarBenchmarks.forEach(link => link.classList.remove('active'));
+
+        if (activeSection && sectionMap.has(activeSection)) {
+            sectionMap.get(activeSection).classList.add('active');
+        }
+        if (activeBench && benchMap.has(activeBench)) {
+            benchMap.get(activeBench).classList.add('active');
+            // Also scroll sidebar to show active item
+            const activeLink = benchMap.get(activeBench);
+            const sidebarRect = sidebar.getBoundingClientRect();
+            const linkRect = activeLink.getBoundingClientRect();
+            if (linkRect.top < sidebarRect.top || linkRect.bottom > sidebarRect.bottom) {
+                activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+    }
+
+    // Throttle scroll handler
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateSidebarHighlight();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Initial highlight
+    updateSidebarHighlight();
+})();
+            </script></body></html>
