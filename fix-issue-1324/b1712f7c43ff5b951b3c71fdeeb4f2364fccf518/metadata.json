@@ -1,0 +1,11 @@
+{
+  "commit": "b1712f7c43ff5b951b3c71fdeeb4f2364fccf518",
+  "commit_short": "b1712f7c",
+  "branch": "fix-issue-1324",
+  "branch_original": "fix-issue-1324",
+  "pr_number": "1325",
+  "timestamp": "2025-12-17T07:32:26.664Z",
+  "timestamp_display": "2025-12-17 07:32:26 UTC",
+  "commit_message": "fix: support --help flag for subcommands\n\nAdd support for displaying help text when --help, -h, or other help flags\nare used with subcommands. For example, `cargo xtask bench --help` now\nproperly displays help for the bench subcommand instead of treating it as\nan unknown flag.\n\nThe fix integrates help flag detection into the subcommand parsing workflow\nin `handle_subcommand_field()`. When a help flag is detected after a\nsubcommand name, the parser generates subcommand-specific help text using\nthe existing `generate_subcommand_help()` function and returns it via a\nHelpRequested error.\n\nThis enables a better user experience where:\n- `program --help` shows top-level help\n- `program subcommand --help` shows subcommand-specific help\n- Nested subcommands like `program sub-one sub-two --help` also work\n\nFixes #1324",
+  "pr_title": "fix: support --help flag for subcommands"
+}
