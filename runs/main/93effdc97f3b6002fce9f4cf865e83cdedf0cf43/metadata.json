@@ -1,0 +1,11 @@
+{
+  "commit": "93effdc97f3b6002fce9f4cf865e83cdedf0cf43",
+  "commit_short": "93effdc9",
+  "branch": "main",
+  "branch_original": "main",
+  "pr_number": "",
+  "timestamp": "2025-12-17T21:51:46.597092430+00:00",
+  "timestamp_display": "2025-12-17 21:51:46 UTC",
+  "commit_message": "Split perf benchmarks into parallel jobs with serialized publish\n\n- perf-divan: runs divan benchmarks, uploads artifact\n- perf-gungraun: runs gungraun benchmarks, uploads artifact\n- perf-publish: downloads both artifacts, generates index, pushes\n\nThe publish job uses global concurrency (group: perf-push) to prevent\nrace conditions when multiple workflow runs try to push to gh-pages.\n\nAlso switches from git config core.sshCommand to GIT_SSH_COMMAND env var\nfor more reliable SSH key inheritance in subprocesses.",
+  "pr_title": ""
+}
