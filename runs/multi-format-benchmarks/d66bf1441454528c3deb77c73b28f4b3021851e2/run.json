@@ -1,0 +1,1776 @@
+{
+  "schema": "run-v1",
+  "run": {
+    "run_id": "multi-format-benchmarks/d66bf1441454528c3deb77c73b28f4b3021851e2",
+    "branch_key": "multi-format-benchmarks",
+    "branch_original": null,
+    "sha": "d66bf1441454528c3deb77c73b28f4b3021851e2",
+    "commit": null,
+    "short": "d66bf144",
+    "commit_short": null,
+    "timestamp": "2025-12-30T19:59:14.863579274+00:00",
+    "generated_at": null,
+    "timestamp_unix": 1767124754,
+    "commit_message": "Multi-format benchmark infrastructure (perf.facet.rs)",
+    "pr_number": "1548",
+    "pr_title": "Multi-format benchmark infrastructure (perf.facet.rs)",
+    "tool_versions": {
+      "divan": "present",
+      "gungraun": "present"
+    }
+  },
+  "defaults": {
+    "operation": "deserialize",
+    "metric": "instructions",
+    "baseline_target": "serde_json",
+    "primary_target": "facet_json_t2",
+    "comparison_mode": "none"
+  },
+  "catalog": {
+    "formats_order": [
+      "json",
+      "postcard"
+    ],
+    "formats": {
+      "json": {
+        "key": "json",
+        "label": "JSON",
+        "baseline_target": "serde_json",
+        "primary_target": "facet_json_t2"
+      },
+      "postcard": {
+        "key": "postcard",
+        "label": "Postcard",
+        "baseline_target": "postcard",
+        "primary_target": "facet_postcard_t0"
+      }
+    },
+    "groups_order": [
+      "micro",
+      "synthetic",
+      "realistic"
+    ],
+    "groups": {
+      "micro": {
+        "label": "Micro Benchmarks",
+        "benchmarks_order": [
+          "json::simple_struct",
+          "json::short_keys",
+          "json::medium_keys",
+          "json::long_keys",
+          "json::single_nested_struct",
+          "json::nest_1",
+          "json::nest_2",
+          "json::nest_3",
+          "json::simple_with_options",
+          "postcard::vec_bool_1k",
+          "postcard::vec_u8_empty",
+          "postcard::vec_u8_16",
+          "postcard::vec_u8_256",
+          "postcard::vec_u8_1k",
+          "postcard::vec_u8_64k",
+          "postcard::vec_u64_small",
+          "postcard::simple_struct",
+          "postcard::nested_struct"
+        ]
+      },
+      "synthetic": {
+        "label": "Synthetic Benchmarks",
+        "benchmarks_order": [
+          "json::booleans",
+          "json::integers",
+          "json::floats",
+          "json::short_strings",
+          "json::long_strings",
+          "json::escaped_strings",
+          "json::hashmaps",
+          "json::nested_structs",
+          "json::options",
+          "json::wide_struct_50",
+          "json::wide_struct_63",
+          "json::unknown_fields",
+          "json::deep_nesting_5levels",
+          "json::large_strings_escaped",
+          "json::large_strings_unescaped",
+          "json::big_array_10k",
+          "json::flatten_2enums",
+          "json::flatten_4enums",
+          "postcard::vec_u32_1k",
+          "postcard::vec_u64_1k",
+          "postcard::vec_u64_large",
+          "postcard::vec_i32_1k",
+          "postcard::vec_i64_1k",
+          "postcard::wide_struct",
+          "postcard::vec_simple_struct",
+          "postcard::vec_string_short",
+          "postcard::vec_string_long"
+        ]
+      },
+      "realistic": {
+        "label": "Realistic Benchmarks",
+        "benchmarks_order": [
+          "json::twitter",
+          "json::canada",
+          "json::citm_catalog"
+        ]
+      }
+    },
+    "benchmarks": {
+      "json::simple_struct": {
+        "key": "json::simple_struct",
+        "label": "simple_struct",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::short_keys": {
+        "key": "json::short_keys",
+        "label": "short_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::medium_keys": {
+        "key": "json::medium_keys",
+        "label": "medium_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::long_keys": {
+        "key": "json::long_keys",
+        "label": "long_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::single_nested_struct": {
+        "key": "json::single_nested_struct",
+        "label": "single_nested_struct",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_1": {
+        "key": "json::nest_1",
+        "label": "nest_1",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_2": {
+        "key": "json::nest_2",
+        "label": "nest_2",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_3": {
+        "key": "json::nest_3",
+        "label": "nest_3",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::simple_with_options": {
+        "key": "json::simple_with_options",
+        "label": "simple_with_options",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::booleans": {
+        "key": "json::booleans",
+        "label": "booleans",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::integers": {
+        "key": "json::integers",
+        "label": "integers",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::floats": {
+        "key": "json::floats",
+        "label": "floats",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::short_strings": {
+        "key": "json::short_strings",
+        "label": "short_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::long_strings": {
+        "key": "json::long_strings",
+        "label": "long_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::escaped_strings": {
+        "key": "json::escaped_strings",
+        "label": "escaped_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::hashmaps": {
+        "key": "json::hashmaps",
+        "label": "hashmaps",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nested_structs": {
+        "key": "json::nested_structs",
+        "label": "nested_structs",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::options": {
+        "key": "json::options",
+        "label": "options",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::wide_struct_50": {
+        "key": "json::wide_struct_50",
+        "label": "wide_struct_50",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::wide_struct_63": {
+        "key": "json::wide_struct_63",
+        "label": "wide_struct_63",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::unknown_fields": {
+        "key": "json::unknown_fields",
+        "label": "unknown_fields",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::deep_nesting_5levels": {
+        "key": "json::deep_nesting_5levels",
+        "label": "deep_nesting_5levels",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::large_strings_escaped": {
+        "key": "json::large_strings_escaped",
+        "label": "large_strings_escaped",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::large_strings_unescaped": {
+        "key": "json::large_strings_unescaped",
+        "label": "large_strings_unescaped",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::big_array_10k": {
+        "key": "json::big_array_10k",
+        "label": "big_array_10k",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::flatten_2enums": {
+        "key": "json::flatten_2enums",
+        "label": "flatten_2enums",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::flatten_4enums": {
+        "key": "json::flatten_4enums",
+        "label": "flatten_4enums",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::twitter": {
+        "key": "json::twitter",
+        "label": "twitter",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::canada": {
+        "key": "json::canada",
+        "label": "canada",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::citm_catalog": {
+        "key": "json::citm_catalog",
+        "label": "citm_catalog",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_bool_1k": {
+        "key": "postcard::vec_bool_1k",
+        "label": "vec_bool_1k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_empty": {
+        "key": "postcard::vec_u8_empty",
+        "label": "vec_u8_empty",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_16": {
+        "key": "postcard::vec_u8_16",
+        "label": "vec_u8_16",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_256": {
+        "key": "postcard::vec_u8_256",
+        "label": "vec_u8_256",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_1k": {
+        "key": "postcard::vec_u8_1k",
+        "label": "vec_u8_1k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_64k": {
+        "key": "postcard::vec_u8_64k",
+        "label": "vec_u8_64k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_small": {
+        "key": "postcard::vec_u64_small",
+        "label": "vec_u64_small",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::simple_struct": {
+        "key": "postcard::simple_struct",
+        "label": "simple_struct",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::nested_struct": {
+        "key": "postcard::nested_struct",
+        "label": "nested_struct",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u32_1k": {
+        "key": "postcard::vec_u32_1k",
+        "label": "vec_u32_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_1k": {
+        "key": "postcard::vec_u64_1k",
+        "label": "vec_u64_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_large": {
+        "key": "postcard::vec_u64_large",
+        "label": "vec_u64_large",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_i32_1k": {
+        "key": "postcard::vec_i32_1k",
+        "label": "vec_i32_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_i64_1k": {
+        "key": "postcard::vec_i64_1k",
+        "label": "vec_i64_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::wide_struct": {
+        "key": "postcard::wide_struct",
+        "label": "wide_struct",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_simple_struct": {
+        "key": "postcard::vec_simple_struct",
+        "label": "vec_simple_struct",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_string_short": {
+        "key": "postcard::vec_string_short",
+        "label": "vec_string_short",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_string_long": {
+        "key": "postcard::vec_string_long",
+        "label": "vec_string_long",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      }
+    },
+    "targets": {
+      "serde_json": {
+        "key": "serde_json",
+        "label": "serde_json",
+        "kind": "baseline"
+      },
+      "facet_json_t2": {
+        "key": "facet_json_t2",
+        "label": "facet+jit2",
+        "kind": "facet"
+      },
+      "facet_json_t1": {
+        "key": "facet_json_t1",
+        "label": "facet+jit1",
+        "kind": "facet"
+      },
+      "facet_json_t0": {
+        "key": "facet_json_t0",
+        "label": "facet",
+        "kind": "facet"
+      },
+      "postcard": {
+        "key": "postcard",
+        "label": "postcard",
+        "kind": "baseline"
+      },
+      "facet_postcard_t0": {
+        "key": "facet_postcard_t0",
+        "label": "facet",
+        "kind": "facet"
+      }
+    },
+    "metrics": {
+      "instructions": {
+        "key": "instructions",
+        "label": "Instructions",
+        "unit": "count",
+        "better": "lower"
+      },
+      "estimated_cycles": {
+        "key": "estimated_cycles",
+        "label": "Est. Cycles",
+        "unit": "count",
+        "better": "lower"
+      },
+      "time_median_ns": {
+        "key": "time_median_ns",
+        "label": "Median Time",
+        "unit": "ns",
+        "better": "lower"
+      },
+      "l1_hits": {
+        "key": "l1_hits",
+        "label": "L1 Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "ll_hits": {
+        "key": "ll_hits",
+        "label": "LL Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "ram_hits": {
+        "key": "ram_hits",
+        "label": "RAM Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "total_read_write": {
+        "key": "total_read_write",
+        "label": "Total R/W",
+        "unit": "count",
+        "better": "lower"
+      }
+    }
+  },
+  "results": {
+    "values": {
+      "json::simple_struct": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::short_keys": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::medium_keys": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::long_keys": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::single_nested_struct": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::nest_1": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::nest_2": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::nest_3": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::simple_with_options": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::booleans": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::integers": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::floats": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::short_strings": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::long_strings": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::escaped_strings": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::hashmaps": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::nested_structs": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::options": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::wide_struct_50": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::wide_struct_63": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::unknown_fields": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::deep_nesting_5levels": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::large_strings_escaped": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::large_strings_unescaped": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::big_array_10k": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::flatten_2enums": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::flatten_4enums": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::twitter": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::canada": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "json::citm_catalog": {
+        "deserialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        },
+        "serialize": {
+          "serde_json": null,
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": null
+        }
+      },
+      "postcard::vec_bool_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u8_empty": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u8_16": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u8_256": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u8_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u8_64k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u64_small": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::simple_struct": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::nested_struct": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u32_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u64_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_u64_large": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_i32_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_i64_1k": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::wide_struct": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_simple_struct": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_string_short": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      },
+      "postcard::vec_string_long": {
+        "deserialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        },
+        "serialize": {
+          "postcard": null,
+          "facet_postcard_t0": null
+        }
+      }
+    },
+    "errors": {
+      "_parse_failures": null
+    }
+  }
+}

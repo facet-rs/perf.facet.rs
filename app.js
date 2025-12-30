@@ -3,461 +3,236 @@
 //
 // Types are generated from tools/benchmark-analyzer/src/run_types.rs
 // See run-types.d.ts for the TypeScript interfaces
-
 // @ts-ignore - ESM imports from CDN
-import { h, render, VNode, ComponentChildren } from 'https://esm.sh/preact@10.19.3';
+import { h, render } from 'https://esm.sh/preact@10.19.3';
 // @ts-ignore - ESM imports from CDN
-import { useState, useEffect, useCallback, useMemo, useRef, StateUpdater } from 'https://esm.sh/preact@10.19.3/hooks';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'https://esm.sh/preact@10.19.3/hooks';
 // @ts-ignore - ESM imports from CDN
 import { Router, Route, useParams } from 'https://esm.sh/wouter-preact@3.8.1?deps=preact@10.19.3';
 // @ts-ignore - ESM imports from CDN
 import { useHashLocation } from 'https://esm.sh/wouter-preact@3.8.1/use-hash-location?deps=preact@10.19.3';
 // @ts-ignore - ESM imports from CDN
 import htm from 'https://esm.sh/htm@3.1.1';
-
 const html = htm.bind(h);
-
-// ============================================================================
-// Type Definitions
-// ============================================================================
-
-// Run data types (from run-types.d.ts, inlined for reference)
-interface RunJson {
-  schema?: string;
-  run: RunMeta;
-  defaults?: RunDefaults;
-  catalog?: RunCatalog;
-  results: RunResults;
-}
-
-interface RunMeta {
-  run_id: string;
-  branch_key: string;
-  branch_original?: string;
-  sha?: string;
-  commit?: string;
-  short?: string;
-  commit_short?: string;
-  timestamp?: string;
-  generated_at?: string;
-  timestamp_unix?: number;
-  commit_message: string;
-  pr_number?: string;
-  pr_title?: string;
-}
-
-interface RunDefaults {
-  operation: string;
-  metric: string;
-  baseline_target: string;
-  primary_target: string;
-  comparison_mode: string;
-}
-
-interface RunCatalog {
-  formats_order: string[];
-  formats: Record<string, FormatDef>;
-  groups_order: string[];
-  groups: Record<string, GroupDef>;
-  benchmarks: Record<string, BenchmarkDef>;
-  targets: Record<string, TargetDef>;
-  metrics: Record<string, MetricDef>;
-}
-
-interface FormatDef {
-  key: string;
-  label: string;
-  baseline_target: string;
-  primary_target: string;
-}
-
-interface GroupDef {
-  label: string;
-  benchmarks_order: string[];
-}
-
-interface BenchmarkDef {
-  key: string;
-  label: string;
-  group: string;
-  format: string;
-  targets_order: string[];
-  metrics_order: string[];
-}
-
-interface TargetDef {
-  key: string;
-  label: string;
-  kind: string;
-}
-
-interface MetricDef {
-  key: string;
-  label: string;
-  unit: string;
-  better: string;
-}
-
-interface RunResults {
-  values: Record<string, BenchmarkOps>;
-  errors: RunErrors;
-}
-
-interface BenchmarkOps {
-  deserialize: Record<string, TargetMetrics | null>;
-  serialize: Record<string, TargetMetrics | null>;
-}
-
-interface TargetMetrics {
-  instructions?: number;
-  estimated_cycles?: number;
-  time_median_ns?: number;
-  l1_hits?: number;
-  ll_hits?: number;
-  ram_hits?: number;
-  total_read_write?: number;
-  tier2_attempts?: number;
-  tier2_successes?: number;
-  tier2_compile_unsupported?: number;
-  tier2_runtime_unsupported?: number;
-  tier2_runtime_error?: number;
-  tier1_fallbacks?: number;
-}
-
-interface RunErrors {
-  _parse_failures?: {
-    divan: string[];
-    gungraun: string[];
-  };
-}
-
-// Index data types
-interface IndexData {
-  timeline?: string[];
-  commits?: Record<string, CommitData>;
-  baseline?: BaselineData;
-}
-
-interface CommitData {
-  sha: string;
-  short?: string;
-  subject?: string;
-  branches_present?: string[];
-  timestamp_unix?: number;
-  summary?: CommitSummary;
-  headline?: HeadlineData;
-  runs?: Record<string, RunRef>;
-  primary_default?: { branch_key: string };
-}
-
-interface CommitSummary {
-  headline?: HeadlineData;
-  highlights?: {
-    regressions?: HighlightItem[];
-    improvements?: HighlightItem[];
-  };
-}
-
-interface HeadlineData {
-  ratio?: number;
-  delta_vs_baseline?: number;
-  delta_direction?: string;
-}
-
-interface HighlightItem {
-  benchmark: string;
-  delta_percent: number;
-}
-
-interface RunRef {
-  url?: string;
-}
-
-interface BaselineData {
-  commit_sha?: string;
-  branch_key?: string;
-  headline?: HeadlineData;
-}
-
-// Component prop types
-interface HashRouterProps {
-  children: ComponentChildren;
-}
-
-interface LinkProps {
-  href: string;
-  children: ComponentChildren;
-  class?: string;
-  [key: string]: any;
-}
-
-interface DropdownItem {
-  value: string;
-  label: string;
-  meta?: string;
-}
-
-interface DropdownProps {
-  trigger: ComponentChildren;
-  items: DropdownItem[];
-  value: string;
-  onChange: (value: string) => void;
-}
-
 // Hash-based router wrapper
-function HashRouter({ children }: HashRouterProps): VNode {
-  return html`<${Router} hook=${useHashLocation}>${children}<//>`;
+function HashRouter({ children }) {
+    return html `<${Router} hook=${useHashLocation}>${children}<//>`;
 }
-
 // ============================================================================
 // Data Layer
 // ============================================================================
-
-const runCache = new Map<string, RunJson>();
-let indexDataCache: IndexData | null = null;
-
-async function fetchIndexData(): Promise<IndexData | null> {
-  if (indexDataCache) return indexDataCache;
-
-  try {
-    let response = await fetch('/index-v2.json');
-    if (!response.ok) response = await fetch('/index.json');
-    if (!response.ok) throw new Error('Failed to load index');
-    indexDataCache = await response.json();
-    return indexDataCache;
-  } catch (e) {
-    console.error('Failed to fetch index:', e);
-    return null;
-  }
+const runCache = new Map();
+let indexDataCache = null;
+async function fetchIndexData() {
+    if (indexDataCache)
+        return indexDataCache;
+    try {
+        let response = await fetch('/index-v2.json');
+        if (!response.ok)
+            response = await fetch('/index.json');
+        if (!response.ok)
+            throw new Error('Failed to load index');
+        indexDataCache = await response.json();
+        return indexDataCache;
+    }
+    catch (e) {
+        console.error('Failed to fetch index:', e);
+        return null;
+    }
 }
-
-async function fetchRunData(url: string): Promise<RunJson | null> {
-  if (runCache.has(url)) return runCache.get(url) || null;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const data: RunJson = await response.json();
-    runCache.set(url, data);
-    return data;
-  } catch (e) {
-    console.error(`Failed to fetch ${url}:`, e);
-    return null;
-  }
+async function fetchRunData(url) {
+    if (runCache.has(url))
+        return runCache.get(url) || null;
+    try {
+        const response = await fetch(url);
+        if (!response.ok)
+            return null;
+        const data = await response.json();
+        runCache.set(url, data);
+        return data;
+    }
+    catch (e) {
+        console.error(`Failed to fetch ${url}:`, e);
+        return null;
+    }
 }
-
-// ============================================================================
-// Utility Functions
-// ============================================================================
-
-interface TierIndicator {
-  icon: string;
-  label: string;
-  title: string;
-  color: string;
+function formatNumber(n) {
+    if (n === null || n === undefined)
+        return '—';
+    return n.toLocaleString();
 }
-
-interface SpeedupResult {
-  text: string;
-  label: string;
-  color: string | null;
+function formatRatio(ratio) {
+    if (!ratio || ratio <= 0)
+        return '—';
+    return `${ratio.toFixed(2)}×`;
 }
-
-interface DeltaResult {
-  text: string;
-  color: string;
-  icon: string;
-}
-
-interface RatioResult {
-  text: string;
-  color: string | null;
-}
-
-function formatNumber(n: number | null | undefined): string {
-  if (n === null || n === undefined) return '—';
-  return n.toLocaleString();
-}
-
-function formatRatio(ratio: number | null | undefined): string {
-  if (!ratio || ratio <= 0) return '—';
-  return `${ratio.toFixed(2)}×`;
-}
-
 // Format tier usage indicators for JIT targets
-function getTierIndicator(targetData: TargetMetrics | null | undefined, targetId: string): TierIndicator | null {
-  // Only show tier indicators for jit_t2 targets
-  if (!targetId.includes('jit_t2')) return null;
-
-  const tier2_attempts = targetData?.tier2_attempts ?? 0;
-  const tier2_successes = targetData?.tier2_successes ?? 0;
-  const tier1_fallbacks = targetData?.tier1_fallbacks ?? 0;
-
-  // No tier data available
-  if (tier2_attempts === 0 && tier1_fallbacks === 0) {
+function getTierIndicator(targetData, targetId) {
+    // Only show tier indicators for jit_t2 targets
+    if (!targetId.includes('jit_t2'))
+        return null;
+    const tier2_attempts = targetData?.tier2_attempts ?? 0;
+    const tier2_successes = targetData?.tier2_successes ?? 0;
+    const tier1_fallbacks = targetData?.tier1_fallbacks ?? 0;
+    // No tier data available
+    if (tier2_attempts === 0 && tier1_fallbacks === 0) {
+        return null;
+    }
+    // Tier-2 success
+    if (tier2_successes > 0) {
+        return {
+            icon: '⚡',
+            label: 'Tier-2',
+            title: `Using Tier-2 JIT (format-specific IR, ${tier2_successes}/${tier2_attempts} successful)`,
+            color: 'var(--good)'
+        };
+    }
+    // Tier-1 fallback
+    if (tier1_fallbacks > 0) {
+        return {
+            icon: '⚙',
+            label: 'Tier-1',
+            title: `Tier-2 unavailable, using Tier-1 JIT (shape-based, ${tier1_fallbacks} fallbacks)`,
+            color: 'var(--warning)'
+        };
+    }
     return null;
-  }
-
-  // Tier-2 success
-  if (tier2_successes > 0) {
-    return {
-      icon: '⚡',
-      label: 'Tier-2',
-      title: `Using Tier-2 JIT (format-specific IR, ${tier2_successes}/${tier2_attempts} successful)`,
-      color: 'var(--good)'
-    };
-  }
-
-  // Tier-1 fallback
-  if (tier1_fallbacks > 0) {
-    return {
-      icon: '⚙',
-      label: 'Tier-1',
-      title: `Tier-2 unavailable, using Tier-1 JIT (shape-based, ${tier1_fallbacks} fallbacks)`,
-      color: 'var(--warning)'
-    };
-  }
-
-  return null;
 }
-
 // Format ratio vs baseline with proper semantics and epsilon for neutrality
 // ratio = baseline_instructions / facet_instructions
 // ratio > 1 means facet uses fewer instructions = faster
 // ratio < 1 means facet uses more instructions = slower
 // ratio ≈ 1 means roughly the same
 function formatSpeedupVsBaseline(ratio, baselineLabel = 'baseline') {
-  if (!ratio || ratio <= 0) return { text: '—', label: '', color: null };
-
-  // Show ratio directly: 0.2× means 20% of baseline's speed, 2× means twice as fast
-  // Higher is always better, no confusing "slower"/"faster" language
-  const EPSILON = 0.03;
-
-  if (Math.abs(ratio - 1) < EPSILON) {
-    return { text: '~1×', label: baselineLabel, color: 'var(--neutral)' };
-  }
-
-  // Color based on whether we're faster or slower than baseline
-  const color = ratio >= 1 ? 'var(--good)' : 'var(--muted)';
-  return { text: `${ratio.toFixed(2)}×`, label: baselineLabel, color };
-}
-
-function formatDelta(delta) {
-  // Positive delta = improvement (ratio went up = faster)
-  // Negative delta = regression (ratio went down = slower)
-  const EPSILON = 0.5;
-  if (Math.abs(delta) < EPSILON) {
-    return { text: `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%`, color: 'var(--neutral)', icon: '▬' };
-  }
-  const sign = delta > 0 ? '+' : '';
-  return {
-    text: `${sign}${delta.toFixed(1)}%`,
-    color: delta > 0 ? 'var(--good)' : 'var(--bad)',
-    icon: delta > 0 ? '▲' : '▼'
-  };
-}
-
-function formatRelativeTime(input) {
-  if (!input) return '—';
-  const date = typeof input === 'number' ? new Date(input * 1000) : new Date(input);
-  const diffMs = Date.now() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHour / 24);
-
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHour < 24) return `${diffHour}h ago`;
-  if (diffDay < 30) return `${diffDay}d ago`;
-  return `${Math.floor(diffDay / 30)}mo ago`;
-}
-
-function formatMetricValue(value, metricId) {
-  if (value === null || value === undefined) return '—';
-  if (metricId === 'time_median_ns') {
-    if (value >= 1e9) return `${(value / 1e9).toFixed(2)}s`;
-    if (value >= 1e6) return `${(value / 1e6).toFixed(2)}ms`;
-    if (value >= 1e3) return `${(value / 1e3).toFixed(2)}μs`;
-    return `${value.toFixed(1)}ns`;
-  }
-  return formatNumber(Math.round(value));
-}
-
-function formatRatioVsBaseline(ratio) {
-  if (ratio === null || ratio === undefined) return { text: '—', color: null };
-  const EPSILON = 0.02; // 2% tolerance for "same"
-  if (Math.abs(ratio - 1) < EPSILON) {
-    return { text: '1×', color: 'var(--neutral)' };
-  }
-  // ratio < 1 means fewer instructions = faster = good
-  // ratio > 1 means more instructions = slower = bad
-  const color = ratio < 1 ? 'var(--good)' : 'var(--bad)';
-  const text = ratio < 1 ? `${ratio.toFixed(2)}×` : `${ratio.toFixed(2)}×`;
-  return { text, color };
-}
-
-// Find which group a benchmark belongs to
-function findBenchmarkGroup(benchId: string, catalog: RunCatalog | undefined | null): string {
-  if (!catalog?.groups) return 'other';
-
-  for (const [groupId, group] of Object.entries(catalog.groups) as [string, GroupDef][]) {
-    if (group.benchmarks_order?.includes(benchId)) {
-      return groupId;
+    if (!ratio || ratio <= 0)
+        return { text: '—', label: '', color: null };
+    // Show ratio directly: 0.2× means 20% of baseline's speed, 2× means twice as fast
+    // Higher is always better, no confusing "slower"/"faster" language
+    const EPSILON = 0.03;
+    if (Math.abs(ratio - 1) < EPSILON) {
+        return { text: '~1×', label: baselineLabel, color: 'var(--neutral)' };
     }
-  }
-  return 'other';
+    // Color based on whether we're faster or slower than baseline
+    const color = ratio >= 1 ? 'var(--good)' : 'var(--muted)';
+    return { text: `${ratio.toFixed(2)}×`, label: baselineLabel, color };
 }
-
+function formatDelta(delta) {
+    // Positive delta = improvement (ratio went up = faster)
+    // Negative delta = regression (ratio went down = slower)
+    const EPSILON = 0.5;
+    if (Math.abs(delta) < EPSILON) {
+        return { text: `${delta > 0 ? '+' : ''}${delta.toFixed(1)}%`, color: 'var(--neutral)', icon: '▬' };
+    }
+    const sign = delta > 0 ? '+' : '';
+    return {
+        text: `${sign}${delta.toFixed(1)}%`,
+        color: delta > 0 ? 'var(--good)' : 'var(--bad)',
+        icon: delta > 0 ? '▲' : '▼'
+    };
+}
+function formatRelativeTime(input) {
+    if (!input)
+        return '—';
+    const date = typeof input === 'number' ? new Date(input * 1000) : new Date(input);
+    const diffMs = Date.now() - date.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffMin < 1)
+        return 'just now';
+    if (diffMin < 60)
+        return `${diffMin}m ago`;
+    if (diffHour < 24)
+        return `${diffHour}h ago`;
+    if (diffDay < 30)
+        return `${diffDay}d ago`;
+    return `${Math.floor(diffDay / 30)}mo ago`;
+}
+function formatMetricValue(value, metricId) {
+    if (value === null || value === undefined)
+        return '—';
+    if (metricId === 'time_median_ns') {
+        if (value >= 1e9)
+            return `${(value / 1e9).toFixed(2)}s`;
+        if (value >= 1e6)
+            return `${(value / 1e6).toFixed(2)}ms`;
+        if (value >= 1e3)
+            return `${(value / 1e3).toFixed(2)}μs`;
+        return `${value.toFixed(1)}ns`;
+    }
+    return formatNumber(Math.round(value));
+}
+function formatRatioVsBaseline(ratio) {
+    if (ratio === null || ratio === undefined)
+        return { text: '—', color: null };
+    const EPSILON = 0.02; // 2% tolerance for "same"
+    if (Math.abs(ratio - 1) < EPSILON) {
+        return { text: '1×', color: 'var(--neutral)' };
+    }
+    // ratio < 1 means fewer instructions = faster = good
+    // ratio > 1 means more instructions = slower = bad
+    const color = ratio < 1 ? 'var(--good)' : 'var(--bad)';
+    const text = ratio < 1 ? `${ratio.toFixed(2)}×` : `${ratio.toFixed(2)}×`;
+    return { text, color };
+}
+// Find which group a benchmark belongs to
+function findBenchmarkGroup(benchId, catalog) {
+    if (!catalog?.groups)
+        return 'other';
+    for (const [groupId, group] of Object.entries(catalog.groups)) {
+        if (group.benchmarks_order?.includes(benchId)) {
+            return groupId;
+        }
+    }
+    return 'other';
+}
 // ============================================================================
 // Shared Components
 // ============================================================================
-
 function Link({ href, children, ...props }) {
-  const [, navigate] = useHashLocation();
-
-  const onClick = useCallback((e) => {
-    if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
-      e.preventDefault();
-      navigate(href);
-    }
-  }, [href, navigate]);
-
-  return html`<a href="#${href}" onClick=${onClick} ...${props}>${children}</a>`;
+    const [, navigate] = useHashLocation();
+    const onClick = useCallback((e) => {
+        if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            e.preventDefault();
+            navigate(href);
+        }
+    }, [href, navigate]);
+    return html `<a href="#${href}" onClick=${onClick} ...${props}>${children}</a>`;
 }
-
 function Dropdown({ trigger, items, value, onChange }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    };
-    const escHandler = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('click', handler);
-    document.addEventListener('keydown', escHandler);
-    return () => {
-      document.removeEventListener('click', handler);
-      document.removeEventListener('keydown', escHandler);
-    };
-  }, [open]);
-
-  return html`
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+    useEffect(() => {
+        if (!open)
+            return;
+        const handler = (e) => {
+            if (ref.current && !ref.current.contains(e.target))
+                setOpen(false);
+        };
+        const escHandler = (e) => { if (e.key === 'Escape')
+            setOpen(false); };
+        document.addEventListener('click', handler);
+        document.addEventListener('keydown', escHandler);
+        return () => {
+            document.removeEventListener('click', handler);
+            document.removeEventListener('keydown', escHandler);
+        };
+    }, [open]);
+    return html `
     <div class="dropdown" ref=${ref}>
       <button class="dropdown-trigger" onClick=${() => setOpen(!open)}>
         ${trigger} <span class="dropdown-arrow">▼</span>
       </button>
-      ${open && html`
+      ${open && html `
         <div class="dropdown-menu">
-          ${items.map(item => html`
+          ${items.map(item => html `
             <button
               key=${item.value}
               class="dropdown-item ${item.value === value ? 'active' : ''}"
               onClick=${() => { onChange(item.value); setOpen(false); }}
             >
               <span class="dropdown-label">${item.label}</span>
-              ${item.meta && html`<span class="dropdown-meta">${item.meta}</span>`}
+              ${item.meta && html `<span class="dropdown-meta">${item.meta}</span>`}
             </button>
           `)}
         </div>
@@ -465,48 +240,45 @@ function Dropdown({ trigger, items, value, onChange }) {
     </div>
   `;
 }
-
 // ============================================================================
 // Index Page - Commit-Centric Timeline
 // ============================================================================
-
 function IndexPage() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('');
-
-  useEffect(() => {
-    fetchIndexData().then(d => {
-      if (d) setData(d);
-      else setError('Failed to load index data');
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) return html`<div class="loading">Loading...</div>`;
-  if (error) return html`<div class="error">${error}</div>`;
-  if (!data) return html`<div class="error">No data</div>`;
-
-  const timeline = data.timeline || Object.keys(data.commits || {});
-  const baseline = data.baseline;
-  const baselineRatio = baseline?.headline?.ratio;
-
-  const filteredTimeline = filter
-    ? timeline.filter(sha => {
-        const commit = data.commits?.[sha];
-        if (!commit) return false;
-        const searchLower = filter.toLowerCase();
-        return (
-          sha.toLowerCase().includes(searchLower) ||
-          commit.short?.toLowerCase().includes(searchLower) ||
-          commit.subject?.toLowerCase().includes(searchLower) ||
-          commit.branches_present?.some(b => b.toLowerCase().includes(searchLower))
-        );
-      })
-    : timeline;
-
-  return html`
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [filter, setFilter] = useState('');
+    useEffect(() => {
+        fetchIndexData().then(d => {
+            if (d)
+                setData(d);
+            else
+                setError('Failed to load index data');
+            setLoading(false);
+        });
+    }, []);
+    if (loading)
+        return html `<div class="loading">Loading...</div>`;
+    if (error)
+        return html `<div class="error">${error}</div>`;
+    if (!data)
+        return html `<div class="error">No data</div>`;
+    const timeline = data.timeline || Object.keys(data.commits || {});
+    const baseline = data.baseline;
+    const baselineRatio = baseline?.headline?.ratio;
+    const filteredTimeline = filter
+        ? timeline.filter(sha => {
+            const commit = data.commits?.[sha];
+            if (!commit)
+                return false;
+            const searchLower = filter.toLowerCase();
+            return (sha.toLowerCase().includes(searchLower) ||
+                commit.short?.toLowerCase().includes(searchLower) ||
+                commit.subject?.toLowerCase().includes(searchLower) ||
+                commit.branches_present?.some(b => b.toLowerCase().includes(searchLower)));
+        })
+        : timeline;
+    return html `
     <div class="index-page">
       <header class="page-header">
         <h1>facet performance benchmarks</h1>
@@ -522,24 +294,25 @@ function IndexPage() {
 
       ${baseline && baselineRatio > 0 ? (() => {
         const speedup = formatSpeedupVsBaseline(baselineRatio);
-        return html`
+        return html `
           <div class="baseline-banner">
             <span class="baseline-label">Baseline: main</span>
             <span class="baseline-value" style=${speedup.color ? `color: ${speedup.color}` : ''}>${speedup.text} ${speedup.label}</span>
-            ${baseline.commit_sha && html`
+            ${baseline.commit_sha && html `
               <${Link} href="/runs/${baseline.branch_key}/${baseline.commit_sha}/deserialize" class="baseline-link">
                 view report
               <//>
             `}
           </div>
         `;
-      })() : null}
+    })() : null}
 
       <div class="commit-timeline">
         ${filteredTimeline.map(sha => {
-          const commit = data.commits?.[sha];
-          if (!commit) return null;
-          return html`
+        const commit = data.commits?.[sha];
+        if (!commit)
+            return null;
+        return html `
             <${CommitRow}
               key=${sha}
               commit=${commit}
@@ -547,64 +320,57 @@ function IndexPage() {
               baselineRatio=${baselineRatio}
             />
           `;
-        })}
-        ${filteredTimeline.length === 0 && html`
+    })}
+        ${filteredTimeline.length === 0 && html `
           <div class="no-results">No commits match your filter</div>
         `}
       </div>
     </div>
   `;
 }
-
 function CommitRow({ commit, baseline, baselineRatio }) {
-  const [expanded, setExpanded] = useState(false);
-
-  // Use new summary structure if available, fall back to old headline
-  const summary = commit.summary;
-  const headline = summary?.headline || commit.headline;
-  const ratio = headline?.ratio;
-
-  // Use pre-computed delta if available, otherwise compute
-  const delta = headline?.delta_vs_baseline ?? (ratio && baselineRatio
-    ? ((ratio - baselineRatio) / baselineRatio) * 100
-    : null);
-  const deltaDirection = headline?.delta_direction;
-  const deltaInfo = delta !== null ? formatDelta(delta) : null;
-
-  // Get highlights
-  const highlights = summary?.highlights;
-  const regressions = highlights?.regressions || [];
-  const improvements = highlights?.improvements || [];
-  const hasHighlights = regressions.length > 0 || improvements.length > 0;
-
-  const primaryBranch = commit.primary_default?.branch_key || commit.branches_present?.[0] || 'main';
-  const isBaseline = baseline?.commit_sha === commit.sha;
-
-  const run = commit.runs?.[primaryBranch];
-  const runUrl = run ? `/runs/${primaryBranch}/${commit.sha}/deserialize` : null;
-
-  return html`
+    const [expanded, setExpanded] = useState(false);
+    // Use new summary structure if available, fall back to old headline
+    const summary = commit.summary;
+    const headline = summary?.headline || commit.headline;
+    const ratio = headline?.ratio;
+    // Use pre-computed delta if available, otherwise compute
+    const delta = headline?.delta_vs_baseline ?? (ratio && baselineRatio
+        ? ((ratio - baselineRatio) / baselineRatio) * 100
+        : null);
+    const deltaDirection = headline?.delta_direction;
+    const deltaInfo = delta !== null ? formatDelta(delta) : null;
+    // Get highlights
+    const highlights = summary?.highlights;
+    const regressions = highlights?.regressions || [];
+    const improvements = highlights?.improvements || [];
+    const hasHighlights = regressions.length > 0 || improvements.length > 0;
+    const primaryBranch = commit.primary_default?.branch_key || commit.branches_present?.[0] || 'main';
+    const isBaseline = baseline?.commit_sha === commit.sha;
+    const run = commit.runs?.[primaryBranch];
+    const runUrl = run ? `/runs/${primaryBranch}/${commit.sha}/deserialize` : null;
+    return html `
     <div class="commit-row ${isBaseline ? 'is-baseline' : ''} ${expanded ? 'expanded' : ''}">
       <div class="commit-main">
         <div class="commit-info">
           <div class="commit-header">
             <span class="commit-sha">${commit.short}</span>
             <span class="commit-branches">
-              ${commit.branches_present?.map(b => html`
+              ${commit.branches_present?.map(b => html `
                 <span key=${b} class="branch-badge ${b === 'main' ? 'main' : ''}">${b}</span>
               `)}
             </span>
-            ${isBaseline && html`<span class="baseline-badge">baseline</span>`}
+            ${isBaseline && html `<span class="baseline-badge">baseline</span>`}
           </div>
           <div class="commit-subject">${commit.subject || '(no message)'}</div>
           <div class="commit-meta">
             ${formatRelativeTime(commit.timestamp_unix)}
-            ${hasHighlights && !expanded && html`
+            ${hasHighlights && !expanded && html `
               <span class="highlights-preview">
-                ${regressions.length > 0 && html`
+                ${regressions.length > 0 && html `
                   <span class="hl-badge hl-regression">▼ ${regressions.length} slower</span>
                 `}
-                ${improvements.length > 0 && html`
+                ${improvements.length > 0 && html `
                   <span class="hl-badge hl-improvement">▲ ${improvements.length} faster</span>
                 `}
               </span>
@@ -613,13 +379,13 @@ function CommitRow({ commit, baseline, baselineRatio }) {
         </div>
         <div class="commit-result">
           ${ratio > 0 ? (() => {
-            const speedup = formatSpeedupVsBaseline(ratio);
-            return html`
+        const speedup = formatSpeedupVsBaseline(ratio);
+        return html `
               <span class="result-value" style=${speedup.color ? `color: ${speedup.color}` : ''}>${speedup.text}</span>
               <span class="result-label">${speedup.label}</span>
             `;
-          })() : html`<span class="result-na">—</span>`}
-          ${deltaInfo && !isBaseline && html`
+    })() : html `<span class="result-na">—</span>`}
+          ${deltaInfo && !isBaseline && html `
             <span class="result-delta" style="color: ${deltaInfo.color}">
               ${deltaInfo.icon} ${deltaInfo.text}
             </span>
@@ -628,21 +394,21 @@ function CommitRow({ commit, baseline, baselineRatio }) {
       </div>
 
       <div class="commit-actions">
-        ${runUrl && html`<${Link} href=${runUrl} class="action-link">view report<//>`}
-        ${hasHighlights && html`
+        ${runUrl && html `<${Link} href=${runUrl} class="action-link">view report<//>`}
+        ${hasHighlights && html `
           <button class="expand-btn" onClick=${() => setExpanded(!expanded)}>
             ${expanded ? '▲ less' : '▼ details'}
           </button>
         `}
       </div>
 
-      ${expanded && hasHighlights && html`
+      ${expanded && hasHighlights && html `
         <div class="commit-expansion">
-          ${regressions.length > 0 && html`
+          ${regressions.length > 0 && html `
             <div class="highlights-section">
               <div class="hl-section-title hl-regression-title">Regressions vs baseline</div>
               <div class="hl-list">
-                ${regressions.slice(0, 5).map(r => html`
+                ${regressions.slice(0, 5).map(r => html `
                   <div key=${r.benchmark} class="hl-item hl-regression">
                     <span class="hl-bench">${r.benchmark}</span>
                     <span class="hl-delta">+${Math.abs(r.delta_percent).toFixed(1)}%</span>
@@ -651,11 +417,11 @@ function CommitRow({ commit, baseline, baselineRatio }) {
               </div>
             </div>
           `}
-          ${improvements.length > 0 && html`
+          ${improvements.length > 0 && html `
             <div class="highlights-section">
               <div class="hl-section-title hl-improvement-title">Improvements vs baseline</div>
               <div class="hl-list">
-                ${improvements.slice(0, 5).map(i => html`
+                ${improvements.slice(0, 5).map(i => html `
                   <div key=${i.benchmark} class="hl-item hl-improvement">
                     <span class="hl-bench">${i.benchmark}</span>
                     <span class="hl-delta">${i.delta_percent.toFixed(1)}%</span>
@@ -669,186 +435,173 @@ function CommitRow({ commit, baseline, baselineRatio }) {
     </div>
   `;
 }
-
 // ============================================================================
 // Report Page Components
 // ============================================================================
-
 function ReportPage({ branch, commit, operation, selectedCase }) {
-  const [runData, setRunData] = useState(null);
-  const [indexData, setIndexData] = useState(null);
-  const [compareData, setCompareData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedMetric, setSelectedMetric] = useState('instructions');
-  const [compareMode, setCompareMode] = useState('none'); // 'none' | 'baseline' | 'parent'
-  const [selectedFormat, setSelectedFormat] = useState(null); // null = auto-detect first format
-  const [, navigate] = useHashLocation();
-
-  const op = operation || 'deserialize';
-  const runUrl = `/runs/${branch}/${commit}/run.json`;
-
-  // Load main run data and index
-  useEffect(() => {
-    setLoading(true);
-    setCompareData(null);
-    Promise.all([fetchRunData(runUrl), fetchIndexData()]).then(([run, index]) => {
-      if (run) {
-        setRunData(run);
-      } else {
-        setError('Failed to load benchmark data');
-      }
-      setIndexData(index);
-      setLoading(false);
-    });
-  }, [runUrl]);
-
-  // Load comparison data when compareMode changes
-  useEffect(() => {
-    if (!indexData || compareMode === 'none') {
-      setCompareData(null);
-      return;
-    }
-
-    let compareUrl = null;
-
-    if (compareMode === 'baseline') {
-      const baseline = indexData.baseline;
-      if (baseline && baseline.commit_sha !== commit) {
-        compareUrl = `/runs/${baseline.branch_key}/${baseline.commit_sha}/run.json`;
-      }
-    } else if (compareMode === 'parent') {
-      // Find parent in branch_commits
-      const branchCommits = indexData.branch_commits?.[branch] || [];
-      const currentIdx = branchCommits.findIndex(c => c.sha === commit);
-      if (currentIdx >= 0 && currentIdx < branchCommits.length - 1) {
-        const parent = branchCommits[currentIdx + 1]; // commits are newest-first
-        if (parent) {
-          compareUrl = `/runs/${branch}/${parent.sha}/run.json`;
-        }
-      }
-    }
-
-    if (compareUrl) {
-      fetchRunData(compareUrl).then(data => setCompareData(data));
-    } else {
-      setCompareData(null);
-    }
-  }, [compareMode, indexData, branch, commit]);
-
-  if (loading) return html`<div class="loading">Loading report...</div>`;
-  if (error) return html`<div class="error">${error}</div>`;
-  if (!runData) return html`<div class="error">No data</div>`;
-
-  // Use new catalog structure if available
-  const catalog = runData.catalog;
-  const isNewSchema = runData.schema === 'run-v1' && catalog;
-
-  // Format handling - get available formats from catalog
-  const formats = useMemo(() => {
-    if (!isNewSchema || !catalog?.formats_order) return [];
-    return catalog.formats_order.map(key => ({
-      key,
-      ...catalog.formats?.[key]
-    })).filter(f => f.label);
-  }, [isNewSchema, catalog]);
-
-  // Auto-select first format if none selected
-  const activeFormat = selectedFormat || formats[0]?.key || null;
-
-  // Get format config for the active format
-  const activeFormatConfig = activeFormat ? catalog?.formats?.[activeFormat] : null;
-
-  // Build metrics list from catalog or fall back to old schema
-  const metrics = isNewSchema
-    ? (Object.entries(catalog.metrics || {}) as [string, MetricDef][]).map(([id, m]) => ({ id, label: m.label, unit: m.unit, better: m.better }))
-    : (runData.schema?.metrics || []);
-
-  // Build targets list from catalog or fall back, filtered by format
-  const targets = useMemo(() => {
-    if (isNewSchema) {
-      // Get all targets from catalog
-      const allTargets = (Object.entries(catalog.targets || {}) as [string, TargetDef][]).map(([id, t]) => ({ id, label: t.label, kind: t.kind }));
-
-      // If no format selected, return all targets
-      if (!activeFormat) return allTargets;
-
-      // Get targets for this format from the format's benchmarks
-      // Each benchmark has a targets_order that lists applicable targets
-      const formatBenchmarks = (Object.values(catalog.benchmarks || {}) as BenchmarkDef[]).filter(b => b.format === activeFormat);
-      if (formatBenchmarks.length === 0) return allTargets;
-
-      // Collect unique target IDs from format's benchmarks
-      const formatTargetIds = new Set<string>();
-      formatBenchmarks.forEach(b => {
-        (b.targets_order || []).forEach(t => formatTargetIds.add(t));
-      });
-
-      // Filter and order targets
-      return allTargets.filter(t => formatTargetIds.has(t.id));
-    } else {
-      return runData.ordering?.targets
-        ? runData.ordering.targets.map(id => runData.schema?.targets?.find(t => t.id === id) || { id, label: id })
-        : runData.schema?.targets || [];
-    }
-  }, [isNewSchema, catalog, activeFormat, runData]);
-
-  // Build groups from catalog or fall back, filtered by selected format
-  const groups = useMemo(() => {
-    if (isNewSchema) {
-      return (catalog.groups_order || []).map(groupId => {
-        const group = catalog.groups?.[groupId] || {};
-        // Filter benchmarks by format
-        const filteredBenchmarks = (group.benchmarks_order || []).filter(benchId => {
-          if (!activeFormat) return true;
-          const benchDef = catalog.benchmarks?.[benchId];
-          return benchDef?.format === activeFormat;
+    const [runData, setRunData] = useState(null);
+    const [indexData, setIndexData] = useState(null);
+    const [compareData, setCompareData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedMetric, setSelectedMetric] = useState('instructions');
+    const [compareMode, setCompareMode] = useState('none'); // 'none' | 'baseline' | 'parent'
+    const [selectedFormat, setSelectedFormat] = useState(null); // null = auto-detect first format
+    const [, navigate] = useHashLocation();
+    const op = operation || 'deserialize';
+    const runUrl = `/runs/${branch}/${commit}/run.json`;
+    // Load main run data and index
+    useEffect(() => {
+        setLoading(true);
+        setCompareData(null);
+        Promise.all([fetchRunData(runUrl), fetchIndexData()]).then(([run, index]) => {
+            if (run) {
+                setRunData(run);
+            }
+            else {
+                setError('Failed to load benchmark data');
+            }
+            setIndexData(index);
+            setLoading(false);
         });
-        return {
-          group_id: groupId,
-          label: group.label || sectionLabel(groupId),
-          cases: filteredBenchmarks.map(name => {
-            const benchDef = catalog.benchmarks?.[name];
-            // Display label without format prefix for cleaner UI
-            const displayLabel = benchDef?.label || name;
-            return { case_id: name, label: displayLabel };
-          })
-        };
-      }).filter(g => g.cases.length > 0); // Hide empty groups
-    } else {
-      return runData.ordering?.sections
-        ? runData.ordering.sections.map(section => ({
-            group_id: section,
-            label: sectionLabel(section),
-            cases: (runData.ordering.benchmarks?.[section] || []).map(name => ({ case_id: name, label: name }))
-          }))
-        : runData.groups || [];
-    }
-  }, [isNewSchema, catalog, runData, activeFormat]);
-
-  const branchItems = indexData?.branches ?
-    Object.keys(indexData.branches).map(b => ({ value: b, label: b })) : [];
-  const commitItems = indexData?.branch_commits?.[branch]?.map(c => ({
-    value: c.sha,
-    label: c.short,
-    meta: formatRelativeTime(c.timestamp_unix)
-  })) || [];
-
-  // Build comparison options
-  const compareItems = [
-    { value: 'none', label: 'No comparison' },
-    { value: 'baseline', label: `vs baseline (${indexData?.baseline?.commit_short || 'main'})` },
-    { value: 'parent', label: 'vs previous commit' }
-  ];
-
-  const compareModeLabel = compareItems.find(i => i.value === compareMode)?.label || 'Compare';
-
-  // Helper to navigate to a different benchmark/overview
-  const navigateToCase = (caseId) => {
-    navigate(`/runs/${branch}/${commit}/${op}/${caseId}`);
-  };
-
-  return html`
+    }, [runUrl]);
+    // Load comparison data when compareMode changes
+    useEffect(() => {
+        if (!indexData || compareMode === 'none') {
+            setCompareData(null);
+            return;
+        }
+        let compareUrl = null;
+        if (compareMode === 'baseline') {
+            const baseline = indexData.baseline;
+            if (baseline && baseline.commit_sha !== commit) {
+                compareUrl = `/runs/${baseline.branch_key}/${baseline.commit_sha}/run.json`;
+            }
+        }
+        else if (compareMode === 'parent') {
+            // Find parent in branch_commits
+            const branchCommits = indexData.branch_commits?.[branch] || [];
+            const currentIdx = branchCommits.findIndex(c => c.sha === commit);
+            if (currentIdx >= 0 && currentIdx < branchCommits.length - 1) {
+                const parent = branchCommits[currentIdx + 1]; // commits are newest-first
+                if (parent) {
+                    compareUrl = `/runs/${branch}/${parent.sha}/run.json`;
+                }
+            }
+        }
+        if (compareUrl) {
+            fetchRunData(compareUrl).then(data => setCompareData(data));
+        }
+        else {
+            setCompareData(null);
+        }
+    }, [compareMode, indexData, branch, commit]);
+    if (loading)
+        return html `<div class="loading">Loading report...</div>`;
+    if (error)
+        return html `<div class="error">${error}</div>`;
+    if (!runData)
+        return html `<div class="error">No data</div>`;
+    // Use new catalog structure if available
+    const catalog = runData.catalog;
+    const isNewSchema = runData.schema === 'run-v1' && catalog;
+    // Format handling - get available formats from catalog
+    const formats = useMemo(() => {
+        if (!isNewSchema || !catalog?.formats_order)
+            return [];
+        return catalog.formats_order.map(key => ({
+            key,
+            ...catalog.formats?.[key]
+        })).filter(f => f.label);
+    }, [isNewSchema, catalog]);
+    // Auto-select first format if none selected
+    const activeFormat = selectedFormat || formats[0]?.key || null;
+    // Get format config for the active format
+    const activeFormatConfig = activeFormat ? catalog?.formats?.[activeFormat] : null;
+    // Build metrics list from catalog or fall back to old schema
+    const metrics = isNewSchema
+        ? Object.entries(catalog.metrics || {}).map(([id, m]) => ({ id, label: m.label, unit: m.unit, better: m.better }))
+        : (runData.schema?.metrics || []);
+    // Build targets list from catalog or fall back, filtered by format
+    const targets = useMemo(() => {
+        if (isNewSchema) {
+            // Get all targets from catalog
+            const allTargets = Object.entries(catalog.targets || {}).map(([id, t]) => ({ id, label: t.label, kind: t.kind }));
+            // If no format selected, return all targets
+            if (!activeFormat)
+                return allTargets;
+            // Get targets for this format from the format's benchmarks
+            // Each benchmark has a targets_order that lists applicable targets
+            const formatBenchmarks = Object.values(catalog.benchmarks || {}).filter(b => b.format === activeFormat);
+            if (formatBenchmarks.length === 0)
+                return allTargets;
+            // Collect unique target IDs from format's benchmarks
+            const formatTargetIds = new Set();
+            formatBenchmarks.forEach(b => {
+                (b.targets_order || []).forEach(t => formatTargetIds.add(t));
+            });
+            // Filter and order targets
+            return allTargets.filter(t => formatTargetIds.has(t.id));
+        }
+        else {
+            return runData.ordering?.targets
+                ? runData.ordering.targets.map(id => runData.schema?.targets?.find(t => t.id === id) || { id, label: id })
+                : runData.schema?.targets || [];
+        }
+    }, [isNewSchema, catalog, activeFormat, runData]);
+    // Build groups from catalog or fall back, filtered by selected format
+    const groups = useMemo(() => {
+        if (isNewSchema) {
+            return (catalog.groups_order || []).map(groupId => {
+                const group = catalog.groups?.[groupId] || {};
+                // Filter benchmarks by format
+                const filteredBenchmarks = (group.benchmarks_order || []).filter(benchId => {
+                    if (!activeFormat)
+                        return true;
+                    const benchDef = catalog.benchmarks?.[benchId];
+                    return benchDef?.format === activeFormat;
+                });
+                return {
+                    group_id: groupId,
+                    label: group.label || sectionLabel(groupId),
+                    cases: filteredBenchmarks.map(name => {
+                        const benchDef = catalog.benchmarks?.[name];
+                        // Display label without format prefix for cleaner UI
+                        const displayLabel = benchDef?.label || name;
+                        return { case_id: name, label: displayLabel };
+                    })
+                };
+            }).filter(g => g.cases.length > 0); // Hide empty groups
+        }
+        else {
+            return runData.ordering?.sections
+                ? runData.ordering.sections.map(section => ({
+                    group_id: section,
+                    label: sectionLabel(section),
+                    cases: (runData.ordering.benchmarks?.[section] || []).map(name => ({ case_id: name, label: name }))
+                }))
+                : runData.groups || [];
+        }
+    }, [isNewSchema, catalog, runData, activeFormat]);
+    const branchItems = indexData?.branches ?
+        Object.keys(indexData.branches).map(b => ({ value: b, label: b })) : [];
+    const commitItems = indexData?.branch_commits?.[branch]?.map(c => ({
+        value: c.sha,
+        label: c.short,
+        meta: formatRelativeTime(c.timestamp_unix)
+    })) || [];
+    // Build comparison options
+    const compareItems = [
+        { value: 'none', label: 'No comparison' },
+        { value: 'baseline', label: `vs baseline (${indexData?.baseline?.commit_short || 'main'})` },
+        { value: 'parent', label: 'vs previous commit' }
+    ];
+    const compareModeLabel = compareItems.find(i => i.value === compareMode)?.label || 'Compare';
+    // Helper to navigate to a different benchmark/overview
+    const navigateToCase = (caseId) => {
+        navigate(`/runs/${branch}/${commit}/${op}/${caseId}`);
+    };
+    return html `
     <div class="report-page">
       <nav class="report-nav">
         <div class="nav-left">
@@ -858,9 +611,10 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
             items=${branchItems}
             value=${branch}
             onChange=${(b) => {
-              const firstCommit = indexData?.branch_commits?.[b]?.[0]?.sha;
-              if (firstCommit) navigate(`/runs/${b}/${firstCommit}/${op}/overview`);
-            }}
+        const firstCommit = indexData?.branch_commits?.[b]?.[0]?.sha;
+        if (firstCommit)
+            navigate(`/runs/${b}/${firstCommit}/${op}/overview`);
+    }}
           />
           <span class="nav-sep">/</span>
           <${Dropdown}
@@ -871,7 +625,7 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
           />
         </div>
         <div class="nav-right">
-          ${formats.length > 1 && html`
+          ${formats.length > 1 && html `
             <${Dropdown}
               trigger=${activeFormatConfig?.label || activeFormat || 'Format'}
               items=${formats.map(f => ({ value: f.key, label: f.label }))}
@@ -913,10 +667,10 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
             Overview
           </button>
           <div class="sidebar-divider"></div>
-          ${groups.map(group => html`
+          ${groups.map(group => html `
             <div key=${group.group_id} class="sidebar-group">
               <div class="group-label">${group.label}</div>
-              ${group.cases.map(c => html`
+              ${group.cases.map(c => html `
                 <button
                   key=${c.case_id}
                   class="sidebar-case ${selectedCase === c.case_id ? 'active' : ''}"
@@ -930,7 +684,7 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
         </aside>
 
         <main class="report-main">
-          ${selectedCase === 'overview' ? html`
+          ${selectedCase === 'overview' ? html `
             <${OverviewView}
               runData=${runData}
               metrics=${metrics}
@@ -941,7 +695,7 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
               activeFormat=${activeFormat}
               activeFormatConfig=${activeFormatConfig}
             />
-          ` : selectedCase && html`
+          ` : selectedCase && html `
             <${CaseView}
               caseId=${selectedCase}
               caseData=${isNewSchema ? runData.results?.values?.[selectedCase] : runData.results?.[selectedCase]}
@@ -961,55 +715,49 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
     </div>
   `;
 }
-
 function sectionLabel(section) {
-  const labels = {
-    micro: 'Micro Benchmarks',
-    synthetic: 'Synthetic Benchmarks',
-    realistic: 'Realistic Benchmarks',
-    other: 'Other'
-  };
-  return labels[section] || section;
+    const labels = {
+        micro: 'Micro Benchmarks',
+        synthetic: 'Synthetic Benchmarks',
+        realistic: 'Realistic Benchmarks',
+        other: 'Other'
+    };
+    return labels[section] || section;
 }
-
 function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMetric, operation, compareMode, isNewSchema, activeFormatConfig, catalog }) {
-  if (!caseData) return html`<div class="no-data">No data for ${caseId}</div>`;
-
-  const metricInfo = metrics.find(m => m.id === selectedMetric);
-
-  // Get the format for this benchmark to determine baseline target
-  const benchFormat = catalog?.benchmarks?.[caseId]?.format;
-  const formatConfig = benchFormat ? catalog?.formats?.[benchFormat] : activeFormatConfig;
-  const baselineTargetId = formatConfig?.baseline_target || 'serde_json';
-  const baselineTargetLabel = baselineTargetId;
-
-  // Helper to get metric value from either schema
-  const getMetricValue = (data, targetId, metricId) => {
-    if (!data) return null;
-    if (isNewSchema) {
-      // New schema: caseData is results.values[benchmark]
-      // Structure: { operation: { target: { metric: value } } }
-      return data?.[operation]?.[targetId]?.[metricId] ?? null;
-    } else {
-      // Old schema: caseData.targets[targetId].ops[operation].metrics[metricId]
-      const result = data?.targets?.[targetId]?.ops?.[operation];
-      return result?.ok ? result?.metrics?.[metricId] : null;
-    }
-  };
-
-  const baselineValue = getMetricValue(caseData, baselineTargetId, selectedMetric);
-
-  // Compute chart data (include all targets, even missing ones)
-  const chartData = targets
-    .map(target => {
-      const value = getMetricValue(caseData, target.id, selectedMetric);
-      const compareValue = getMetricValue(compareData, target.id, selectedMetric);
-      return { target, value, compareValue, isMissing: value === null };
+    if (!caseData)
+        return html `<div class="no-data">No data for ${caseId}</div>`;
+    const metricInfo = metrics.find(m => m.id === selectedMetric);
+    // Get the format for this benchmark to determine baseline target
+    const benchFormat = catalog?.benchmarks?.[caseId]?.format;
+    const formatConfig = benchFormat ? catalog?.formats?.[benchFormat] : activeFormatConfig;
+    const baselineTargetId = formatConfig?.baseline_target || 'serde_json';
+    const baselineTargetLabel = baselineTargetId;
+    // Helper to get metric value from either schema
+    const getMetricValue = (data, targetId, metricId) => {
+        if (!data)
+            return null;
+        if (isNewSchema) {
+            // New schema: caseData is results.values[benchmark]
+            // Structure: { operation: { target: { metric: value } } }
+            return data?.[operation]?.[targetId]?.[metricId] ?? null;
+        }
+        else {
+            // Old schema: caseData.targets[targetId].ops[operation].metrics[metricId]
+            const result = data?.targets?.[targetId]?.ops?.[operation];
+            return result?.ok ? result?.metrics?.[metricId] : null;
+        }
+    };
+    const baselineValue = getMetricValue(caseData, baselineTargetId, selectedMetric);
+    // Compute chart data (include all targets, even missing ones)
+    const chartData = targets
+        .map(target => {
+        const value = getMetricValue(caseData, target.id, selectedMetric);
+        const compareValue = getMetricValue(compareData, target.id, selectedMetric);
+        return { target, value, compareValue, isMissing: value === null };
     });
-
-  const maxValue = Math.max(...chartData.filter(d => !d.isMissing).map(d => Math.max(d.value || 0, d.compareValue || 0)));
-
-  return html`
+    const maxValue = Math.max(...chartData.filter(d => !d.isMissing).map(d => Math.max(d.value || 0, d.compareValue || 0)));
+    return html `
     <div class="case-view">
       <h2 class="case-title">${caseId}</h2>
 
@@ -1028,42 +776,38 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
             <th>Target</th>
             <th>${metricInfo?.label || selectedMetric}</th>
             <th>vs ${baselineTargetLabel}</th>
-            ${compareMode !== 'none' && html`<th>Δ vs ${compareMode}</th>`}
+            ${compareMode !== 'none' && html `<th>Δ vs ${compareMode}</th>`}
           </tr>
         </thead>
         <tbody>
           ${targets.map(target => {
-            const value = getMetricValue(caseData, target.id, selectedMetric);
-            const isMissing = value === null;
-
-            const ratio = value && baselineValue ? value / baselineValue : null;
-            const ratioInfo = formatRatioVsBaseline(ratio);
-
-            // Comparison delta
-            const compareValue = getMetricValue(compareData, target.id, selectedMetric);
-            const compareDelta = value && compareValue ? ((value - compareValue) / compareValue) * 100 : null;
-            const compareDeltaInfo = compareDelta !== null ? formatDelta(compareDelta) : null;
-
-            // Get tier indicator for JIT targets
-            const targetData = isNewSchema ? caseData?.[operation]?.[target.id] : caseData?.targets?.[target.id]?.ops?.[operation]?.metrics;
-            const tierIndicator = getTierIndicator(targetData, target.id);
-
-            return html`
+        const value = getMetricValue(caseData, target.id, selectedMetric);
+        const isMissing = value === null;
+        const ratio = value && baselineValue ? value / baselineValue : null;
+        const ratioInfo = formatRatioVsBaseline(ratio);
+        // Comparison delta
+        const compareValue = getMetricValue(compareData, target.id, selectedMetric);
+        const compareDelta = value && compareValue ? ((value - compareValue) / compareValue) * 100 : null;
+        const compareDeltaInfo = compareDelta !== null ? formatDelta(compareDelta) : null;
+        // Get tier indicator for JIT targets
+        const targetData = isNewSchema ? caseData?.[operation]?.[target.id] : caseData?.targets?.[target.id]?.ops?.[operation]?.metrics;
+        const tierIndicator = getTierIndicator(targetData, target.id);
+        return html `
               <tr key=${target.id} class="${target.kind === 'baseline' ? 'baseline-row' : ''} ${isMissing ? 'missing-row' : ''}">
                 <td class="target-cell">
                   <span class="target-label">${target.label}</span>
-                  ${target.kind === 'baseline' && html`<span class="baseline-tag">baseline</span>`}
-                  ${tierIndicator && html`<span class="tier-indicator" style="color: ${tierIndicator.color}" title="${tierIndicator.title}">${tierIndicator.icon} ${tierIndicator.label}</span>`}
+                  ${target.kind === 'baseline' && html `<span class="baseline-tag">baseline</span>`}
+                  ${tierIndicator && html `<span class="tier-indicator" style="color: ${tierIndicator.color}" title="${tierIndicator.title}">${tierIndicator.icon} ${tierIndicator.label}</span>`}
                 </td>
                 <td class="value-cell">
-                  ${isMissing ? html`<span class="missing-value">(missing)</span>` : formatMetricValue(value, selectedMetric)}
+                  ${isMissing ? html `<span class="missing-value">(missing)</span>` : formatMetricValue(value, selectedMetric)}
                 </td>
                 <td class="ratio-cell">
-                  ${isMissing ? html`<span class="missing-value">—</span>` : html`<span style=${ratioInfo.color ? `color: ${ratioInfo.color}` : ''}>${ratioInfo.text}</span>`}
+                  ${isMissing ? html `<span class="missing-value">—</span>` : html `<span style=${ratioInfo.color ? `color: ${ratioInfo.color}` : ''}>${ratioInfo.text}</span>`}
                 </td>
-                ${compareMode !== 'none' && html`
+                ${compareMode !== 'none' && html `
                   <td class="delta-cell">
-                    ${isMissing ? html`<span class="missing-value">—</span>` : compareDeltaInfo ? html`
+                    ${isMissing ? html `<span class="missing-value">—</span>` : compareDeltaInfo ? html `
                       <span style="color: ${compareDeltaInfo.color}">
                         ${compareDeltaInfo.icon} ${compareDeltaInfo.text}
                       </span>
@@ -1072,7 +816,7 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
                 `}
               </tr>
             `;
-          })}
+    })}
         </tbody>
       </table>
 
@@ -1086,30 +830,26 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
     </div>
   `;
 }
-
 // ============================================================================
 // Bar Chart Component
 // ============================================================================
-
 function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, compareMode }) {
-  if (!data || data.length === 0) return null;
-
-  const barHeight = 28;
-  const labelWidth = 140;
-  const chartWidth = 500;
-  const gap = 8;
-  const height = data.length * (barHeight + gap) + 20;
-
-  return html`
+    if (!data || data.length === 0)
+        return null;
+    const barHeight = 28;
+    const labelWidth = 140;
+    const chartWidth = 500;
+    const gap = 8;
+    const height = data.length * (barHeight + gap) + 20;
+    return html `
     <div class="chart-container">
       <svg class="bar-chart" viewBox="0 0 ${labelWidth + chartWidth + 140} ${height}" preserveAspectRatio="xMinYMin meet">
         ${data.map((d, i) => {
-          const y = i * (barHeight + gap) + 10;
-          const isSerde = d.target.kind === 'baseline';
-
-          // Handle missing data
-          if (d.isMissing) {
-            return html`
+        const y = i * (barHeight + gap) + 10;
+        const isSerde = d.target.kind === 'baseline';
+        // Handle missing data
+        if (d.isMissing) {
+            return html `
               <g key=${d.target.id} class="chart-missing">
                 <text
                   x=${labelWidth - 8}
@@ -1124,19 +864,15 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
                 >(missing)</text>
               </g>
             `;
-          }
-
-          const barWidth = maxValue > 0 ? (d.value / maxValue) * chartWidth : 0;
-          const compareWidth = maxValue > 0 && d.compareValue ? (d.compareValue / maxValue) * chartWidth : 0;
-
-          // Color based on whether this is baseline or facet
-          const barColor = isSerde ? 'var(--chart-baseline)' : 'var(--chart-facet)';
-
-          // Compute ratio vs baseline
-          const ratio = baselineValue && d.value ? d.value / baselineValue : null;
-          const ratioInfo = formatRatioVsBaseline(ratio);
-
-          return html`
+        }
+        const barWidth = maxValue > 0 ? (d.value / maxValue) * chartWidth : 0;
+        const compareWidth = maxValue > 0 && d.compareValue ? (d.compareValue / maxValue) * chartWidth : 0;
+        // Color based on whether this is baseline or facet
+        const barColor = isSerde ? 'var(--chart-baseline)' : 'var(--chart-facet)';
+        // Compute ratio vs baseline
+        const ratio = baselineValue && d.value ? d.value / baselineValue : null;
+        const ratioInfo = formatRatioVsBaseline(ratio);
+        return html `
             <g key=${d.target.id}>
               <!-- Label -->
               <text
@@ -1147,7 +883,7 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
               >${d.target.label}</text>
 
               <!-- Comparison bar (if present) -->
-              ${compareMode !== 'none' && compareWidth > 0 && html`
+              ${compareMode !== 'none' && compareWidth > 0 && html `
                 <rect
                   x=${labelWidth}
                   y=${y + 2}
@@ -1173,12 +909,12 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
                 x=${labelWidth + barWidth + 6}
                 y=${y + barHeight / 2 + 4}
                 class="chart-value"
-              >${formatMetricValue(d.value, selectedMetric)}${!isSerde && ratio ? html` <tspan fill=${ratioInfo.color}>(${ratioInfo.text})</tspan>` : ''}</text>
+              >${formatMetricValue(d.value, selectedMetric)}${!isSerde && ratio ? html ` <tspan fill=${ratioInfo.color}>(${ratioInfo.text})</tspan>` : ''}</text>
             </g>
           `;
-        })}
+    })}
       </svg>
-      ${compareMode !== 'none' && html`
+      ${compareMode !== 'none' && html `
         <div class="chart-legend">
           <span class="legend-item"><span class="legend-color" style="background: var(--chart-facet)"></span>Current</span>
           <span class="legend-item"><span class="legend-color" style="background: var(--chart-compare)"></span>${compareMode === 'baseline' ? 'Baseline' : 'Previous'}</span>
@@ -1187,43 +923,42 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
     </div>
   `;
 }
-
 function MetricsDetail({ caseData, targets, metrics, operation, isNewSchema }) {
-  // Helper to check if target has data
-  const hasData = (targetId) => {
-    if (isNewSchema) {
-      return caseData?.[operation]?.[targetId] != null;
-    } else {
-      return caseData?.targets?.[targetId]?.ops?.[operation]?.ok;
-    }
-  };
-
-  // Helper to get metric value
-  const getMetric = (targetId, metricId) => {
-    if (isNewSchema) {
-      return caseData?.[operation]?.[targetId]?.[metricId] ?? null;
-    } else {
-      return caseData?.targets?.[targetId]?.ops?.[operation]?.metrics?.[metricId] ?? null;
-    }
-  };
-
-  return html`
+    // Helper to check if target has data
+    const hasData = (targetId) => {
+        if (isNewSchema) {
+            return caseData?.[operation]?.[targetId] != null;
+        }
+        else {
+            return caseData?.targets?.[targetId]?.ops?.[operation]?.ok;
+        }
+    };
+    // Helper to get metric value
+    const getMetric = (targetId, metricId) => {
+        if (isNewSchema) {
+            return caseData?.[operation]?.[targetId]?.[metricId] ?? null;
+        }
+        else {
+            return caseData?.targets?.[targetId]?.ops?.[operation]?.metrics?.[metricId] ?? null;
+        }
+    };
+    return html `
     <details class="metrics-detail">
       <summary>All metrics</summary>
       <div class="metrics-grid">
-        ${targets.filter(t => hasData(t.id)).map(target => html`
+        ${targets.filter(t => hasData(t.id)).map(target => html `
           <div key=${target.id} class="metrics-card">
             <div class="metrics-card-header">${target.label}</div>
             <div class="metrics-card-body">
               ${metrics.map(m => {
-                const val = getMetric(target.id, m.id);
-                return val !== undefined && val !== null ? html`
+        const val = getMetric(target.id, m.id);
+        return val !== undefined && val !== null ? html `
                   <div key=${m.id} class="metric-row">
                     <span class="metric-label">${m.label}</span>
                     <span class="metric-value">${formatMetricValue(val, m.id)}</span>
                   </div>
                 ` : null;
-              })}
+    })}
             </div>
           </div>
         `)}
@@ -1231,15 +966,12 @@ function MetricsDetail({ caseData, targets, metrics, operation, isNewSchema }) {
     </details>
   `;
 }
-
 // ============================================================================
 // Overview Components
 // ============================================================================
-
 function OverviewSummary({ stats, baselineLabel = 'baseline' }) {
-  const avgRatioInfo = formatRatioVsBaseline(stats.avgRatio);
-
-  return html`
+    const avgRatioInfo = formatRatioVsBaseline(stats.avgRatio);
+    return html `
     <div class="overview-summary">
       <div class="overview-stat">
         <div class="overview-stat-label">Total Benchmarks</div>
@@ -1272,26 +1004,22 @@ function OverviewSummary({ stats, baselineLabel = 'baseline' }) {
     </div>
   `;
 }
-
 // Grouped bars chart - side-by-side comparison
 function GroupedBarsChart({ data, metricDef, onSelectBenchmark }) {
-  const barHeight = 24;
-  const labelWidth = 180;
-  const chartWidth = 600;
-  const gap = 4;
-  const height = data.length * (barHeight + gap) + 20;
-
-  const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
-
-  return html`
+    const barHeight = 24;
+    const labelWidth = 180;
+    const chartWidth = 600;
+    const gap = 4;
+    const height = data.length * (barHeight + gap) + 20;
+    const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
+    return html `
     <svg class="overview-chart" viewBox="0 0 ${labelWidth + chartWidth + 100} ${height}">
       ${data.map((d, i) => {
         const y = i * (barHeight + gap) + 10;
         const baselineWidth = (d.baselineValue / maxValue) * chartWidth;
         const facetWidth = (d.facetValue / maxValue) * chartWidth;
         const barH = (barHeight - gap) / 2;
-
-        return html`
+        return html `
           <g key=${d.id} class="chart-row" onClick=${() => onSelectBenchmark(d.id)} style="cursor: pointer">
             <text x=${labelWidth - 8} y=${y + barHeight / 2 + 4} text-anchor="end" class="chart-label">
               ${d.name}
@@ -1303,25 +1031,22 @@ function GroupedBarsChart({ data, metricDef, onSelectBenchmark }) {
               fill=${d.ratio < 1 ? 'var(--good)' : 'var(--bad)'} rx="2" />
           </g>
         `;
-      })}
+    })}
     </svg>
   `;
 }
-
 // Diverging bars chart - ratio from center
 function DivergingBarsChart({ data, onSelectBenchmark }) {
-  const barHeight = 24;
-  const labelWidth = 180;
-  const chartWidth = 600;
-  const gap = 4;
-  const centerX = labelWidth + chartWidth / 2;
-  const height = data.length * (barHeight + gap) + 20;
-
-  // Find max deviation from 1.0 for scaling
-  const maxDeviation = Math.max(...data.map(d => Math.abs(d.ratio - 1)));
-  const scale = (chartWidth / 2) / (maxDeviation + 0.1);
-
-  return html`
+    const barHeight = 24;
+    const labelWidth = 180;
+    const chartWidth = 600;
+    const gap = 4;
+    const centerX = labelWidth + chartWidth / 2;
+    const height = data.length * (barHeight + gap) + 20;
+    // Find max deviation from 1.0 for scaling
+    const maxDeviation = Math.max(...data.map(d => Math.abs(d.ratio - 1)));
+    const scale = (chartWidth / 2) / (maxDeviation + 0.1);
+    return html `
     <svg class="overview-chart" viewBox="0 0 ${labelWidth + chartWidth + 100} ${height}">
       <!-- Center baseline -->
       <line x1=${centerX} y1="0" x2=${centerX} y2=${height}
@@ -1333,8 +1058,7 @@ function DivergingBarsChart({ data, onSelectBenchmark }) {
         const barWidth = Math.abs(deviation) * scale;
         const x = deviation < 0 ? centerX - barWidth : centerX;
         const color = deviation < 0 ? 'var(--good)' : 'var(--bad)';
-
-        return html`
+        return html `
           <g key=${d.id} class="chart-row" onClick=${() => onSelectBenchmark(d.id)} style="cursor: pointer">
             <text x=${labelWidth - 8} y=${y + barHeight / 2 + 4} text-anchor="end" class="chart-label">
               ${d.name}
@@ -1346,29 +1070,25 @@ function DivergingBarsChart({ data, onSelectBenchmark }) {
             </text>
           </g>
         `;
-      })}
+    })}
     </svg>
   `;
 }
-
 // Dot plot chart - scatter with baseline
 function DotPlotChart({ data, metricDef, onSelectBenchmark }) {
-  const barHeight = 24;
-  const labelWidth = 180;
-  const chartWidth = 600;
-  const gap = 4;
-  const height = data.length * (barHeight + gap) + 20;
-
-  const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
-
-  return html`
+    const barHeight = 24;
+    const labelWidth = 180;
+    const chartWidth = 600;
+    const gap = 4;
+    const height = data.length * (barHeight + gap) + 20;
+    const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
+    return html `
     <svg class="overview-chart" viewBox="0 0 ${labelWidth + chartWidth + 100} ${height}">
       ${data.map((d, i) => {
         const y = i * (barHeight + gap) + 10 + barHeight / 2;
         const baselineX = labelWidth + (d.baselineValue / maxValue) * chartWidth;
         const facetX = labelWidth + (d.facetValue / maxValue) * chartWidth;
-
-        return html`
+        return html `
           <g key=${d.id} class="chart-row" onClick=${() => onSelectBenchmark(d.id)} style="cursor: pointer">
             <text x=${labelWidth - 8} y=${y + 4} text-anchor="end" class="chart-label">
               ${d.name}
@@ -1385,18 +1105,17 @@ function DotPlotChart({ data, metricDef, onSelectBenchmark }) {
               stroke="white" stroke-width="1.5" />
           </g>
         `;
-      })}
+    })}
     </svg>
   `;
 }
-
 function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metricDef, baselineLabel, primaryLabel }) {
-  const sortIndicator = (col) => {
-    if (sortBy !== col) return '';
-    return sortDir === 'asc' ? ' ▲' : ' ▼';
-  };
-
-  return html`
+    const sortIndicator = (col) => {
+        if (sortBy !== col)
+            return '';
+        return sortDir === 'asc' ? ' ▲' : ' ▼';
+    };
+    return html `
     <table class="overview-table">
       <thead>
         <tr>
@@ -1419,8 +1138,8 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
       </thead>
       <tbody>
         ${data.map(d => {
-          const ratioInfo = formatRatioVsBaseline(d.ratio);
-          return html`
+        const ratioInfo = formatRatioVsBaseline(d.ratio);
+        return html `
             <tr class="overview-row" key=${d.id}>
               <td class="bench-name-cell">
                 <a href="#" onClick=${(e) => { e.preventDefault(); onSelectBenchmark(d.id); }}>
@@ -1442,152 +1161,156 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
                 <span class="ratio-value" style="color: ${ratioInfo.color}">
                   ${ratioInfo.text}
                 </span>
-                ${d.ratio < 1 ? html`
+                ${d.ratio < 1 ? html `
                   <span class="ratio-badge faster">faster</span>
-                ` : d.ratio > 1.02 ? html`
+                ` : d.ratio > 1.02 ? html `
                   <span class="ratio-badge slower">slower</span>
                 ` : ''}
               </td>
             </tr>
           `;
-        })}
+    })}
       </tbody>
     </table>
   `;
 }
-
 function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema, onSelectBenchmark, activeFormat, activeFormatConfig }) {
-  const [sortBy, setSortBy] = useState('ratio');
-  const [sortDir, setSortDir] = useState('asc'); // asc = best speedups first
-  const [vizMode, setVizMode] = useState('grouped'); // 'grouped' | 'diverging' | 'dots'
-
-  // Extract benchmarks - handle both old and new schema, filtered by format
-  const benchmarks = useMemo(() => {
-    if (isNewSchema) {
-      const allBenchmarks = Object.keys(runData.results?.values || {});
-      if (!activeFormat) return allBenchmarks;
-      // Filter by format
-      return allBenchmarks.filter(benchId => {
-        const benchDef = runData.catalog?.benchmarks?.[benchId];
-        return benchDef?.format === activeFormat;
-      });
-    } else {
-      return Object.keys(runData.results || {});
-    }
-  }, [isNewSchema, runData, activeFormat]);
-
-  // Get baseline and primary targets for current format
-  const baselineTarget = activeFormatConfig?.baseline_target || 'serde_json';
-  const primaryTarget = activeFormatConfig?.primary_target || 'facet_json_t2';
-
-  const overviewData = useMemo(() => {
-    const data = benchmarks.map(benchId => {
-      let baselineValue, facetValue;
-
-      if (isNewSchema) {
-        // New schema: results.values[benchmark][operation][target][metric]
-        const benchData = runData.results.values[benchId];
-        baselineValue = benchData?.[operation]?.[baselineTarget]?.[selectedMetric];
-        // Use primary target from format config, with fallbacks for JIT tiers
-        facetValue = benchData?.[operation]?.[primaryTarget]?.[selectedMetric];
-        // Fallback to lower tiers if primary not available (for JSON with t2/t1/t0)
-        if (facetValue === undefined && primaryTarget.includes('_t2')) {
-          const baseTarget = primaryTarget.replace('_t2', '');
-          facetValue = benchData?.[operation]?.[`${baseTarget}_t1`]?.[selectedMetric]
-            || benchData?.[operation]?.[`${baseTarget}_t0`]?.[selectedMetric];
+    const [sortBy, setSortBy] = useState('ratio');
+    const [sortDir, setSortDir] = useState('asc'); // asc = best speedups first
+    const [vizMode, setVizMode] = useState('grouped'); // 'grouped' | 'diverging' | 'dots'
+    // Extract benchmarks - handle both old and new schema, filtered by format
+    const benchmarks = useMemo(() => {
+        if (isNewSchema) {
+            const allBenchmarks = Object.keys(runData.results?.values || {});
+            if (!activeFormat)
+                return allBenchmarks;
+            // Filter by format
+            return allBenchmarks.filter(benchId => {
+                const benchDef = runData.catalog?.benchmarks?.[benchId];
+                return benchDef?.format === activeFormat;
+            });
         }
-      } else {
-        // Old schema: results[benchmark].targets[target].ops[operation].metrics[metric]
-        const benchData = runData.results[benchId];
-        const baselineResult = benchData?.targets?.[baselineTarget]?.ops?.[operation];
-        // Try primary target first, then fallback tiers if it's a JIT target
-        let facetResult = benchData?.targets?.[primaryTarget]?.ops?.[operation];
-        if (!facetResult && primaryTarget.includes('_t2')) {
-          const baseTarget = primaryTarget.replace('_t2', '');
-          facetResult = benchData?.targets?.[`${baseTarget}_t1`]?.ops?.[operation]
-            || benchData?.targets?.[`${baseTarget}_t0`]?.ops?.[operation];
+        else {
+            return Object.keys(runData.results || {});
         }
-        baselineValue = baselineResult?.ok ? baselineResult?.metrics?.[selectedMetric] : null;
-        facetValue = facetResult?.ok ? facetResult?.metrics?.[selectedMetric] : null;
-      }
-
-      const ratio = baselineValue && facetValue ? facetValue / baselineValue : null;
-      const group = isNewSchema
-        ? findBenchmarkGroup(benchId, runData.catalog)
-        : findBenchmarkGroup(benchId, { groups: runData.groups?.reduce((acc: Record<string, GroupDef>, g: any) => {
-            acc[g.group_id] = { label: g.group_id, benchmarks_order: g.cases?.map((c: any) => c.case_id) || [] };
-            return acc;
-          }, {}) } as RunCatalog);
-
-      // Get display name (label without format prefix)
-      const benchDef = runData.catalog?.benchmarks?.[benchId];
-      const displayName = benchDef?.label || benchId;
-
-      return {
-        id: benchId,
-        name: displayName,
-        group,
-        baselineValue,
-        facetValue,
-        ratio,
-        hasBothValues: baselineValue !== null && facetValue !== null
-      };
-    }).filter(d => d.hasBothValues); // Only show benchmarks with both values
-
-    return data;
-  }, [runData, selectedMetric, operation, benchmarks, isNewSchema, baselineTarget, primaryTarget]);
-
-  // Sort data
-  const sortedData = useMemo(() => {
-    const sorted = [...overviewData];
-    sorted.sort((a, b) => {
-      let aVal, bVal;
-      switch(sortBy) {
-        case 'name': aVal = a.name; bVal = b.name; break;
-        case 'group': aVal = a.group; bVal = b.group; break;
-        case 'baseline': aVal = a.baselineValue || 0; bVal = b.baselineValue || 0; break;
-        case 'facet': aVal = a.facetValue || 0; bVal = b.facetValue || 0; break;
-        case 'ratio': aVal = a.ratio || 0; bVal = b.ratio || 0; break;
-        default: return 0;
-      }
-      const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      return sortDir === 'asc' ? comparison : -comparison;
-    });
-    return sorted;
-  }, [overviewData, sortBy, sortDir]);
-
-  // Compute summary stats
-  const stats = useMemo(() => {
-    if (overviewData.length === 0) {
-      return { total: 0, faster: 0, slower: 0, neutral: 0, avgRatio: 1 };
-    }
-    return {
-      total: overviewData.length,
-      faster: overviewData.filter(d => d.ratio < 1).length,
-      slower: overviewData.filter(d => d.ratio > 1.02).length,
-      neutral: overviewData.filter(d => d.ratio >= 1 && d.ratio <= 1.02).length,
-      avgRatio: overviewData.reduce((sum, d) => sum + d.ratio, 0) / overviewData.length
+    }, [isNewSchema, runData, activeFormat]);
+    // Get baseline and primary targets for current format
+    const baselineTarget = activeFormatConfig?.baseline_target || 'serde_json';
+    const primaryTarget = activeFormatConfig?.primary_target || 'facet_json_t2';
+    const overviewData = useMemo(() => {
+        const data = benchmarks.map(benchId => {
+            let baselineValue, facetValue;
+            if (isNewSchema) {
+                // New schema: results.values[benchmark][operation][target][metric]
+                const benchData = runData.results.values[benchId];
+                baselineValue = benchData?.[operation]?.[baselineTarget]?.[selectedMetric];
+                // Use primary target from format config, with fallbacks for JIT tiers
+                facetValue = benchData?.[operation]?.[primaryTarget]?.[selectedMetric];
+                // Fallback to lower tiers if primary not available (for JSON with t2/t1/t0)
+                if (facetValue === undefined && primaryTarget.includes('_t2')) {
+                    const baseTarget = primaryTarget.replace('_t2', '');
+                    facetValue = benchData?.[operation]?.[`${baseTarget}_t1`]?.[selectedMetric]
+                        || benchData?.[operation]?.[`${baseTarget}_t0`]?.[selectedMetric];
+                }
+            }
+            else {
+                // Old schema: results[benchmark].targets[target].ops[operation].metrics[metric]
+                const benchData = runData.results[benchId];
+                const baselineResult = benchData?.targets?.[baselineTarget]?.ops?.[operation];
+                // Try primary target first, then fallback tiers if it's a JIT target
+                let facetResult = benchData?.targets?.[primaryTarget]?.ops?.[operation];
+                if (!facetResult && primaryTarget.includes('_t2')) {
+                    const baseTarget = primaryTarget.replace('_t2', '');
+                    facetResult = benchData?.targets?.[`${baseTarget}_t1`]?.ops?.[operation]
+                        || benchData?.targets?.[`${baseTarget}_t0`]?.ops?.[operation];
+                }
+                baselineValue = baselineResult?.ok ? baselineResult?.metrics?.[selectedMetric] : null;
+                facetValue = facetResult?.ok ? facetResult?.metrics?.[selectedMetric] : null;
+            }
+            const ratio = baselineValue && facetValue ? facetValue / baselineValue : null;
+            const group = isNewSchema
+                ? findBenchmarkGroup(benchId, runData.catalog)
+                : findBenchmarkGroup(benchId, { groups: runData.groups?.reduce((acc, g) => {
+                        acc[g.group_id] = { label: g.group_id, benchmarks_order: g.cases?.map((c) => c.case_id) || [] };
+                        return acc;
+                    }, {}) });
+            // Get display name (label without format prefix)
+            const benchDef = runData.catalog?.benchmarks?.[benchId];
+            const displayName = benchDef?.label || benchId;
+            return {
+                id: benchId,
+                name: displayName,
+                group,
+                baselineValue,
+                facetValue,
+                ratio,
+                hasBothValues: baselineValue !== null && facetValue !== null
+            };
+        }).filter(d => d.hasBothValues); // Only show benchmarks with both values
+        return data;
+    }, [runData, selectedMetric, operation, benchmarks, isNewSchema, baselineTarget, primaryTarget]);
+    // Sort data
+    const sortedData = useMemo(() => {
+        const sorted = [...overviewData];
+        sorted.sort((a, b) => {
+            let aVal, bVal;
+            switch (sortBy) {
+                case 'name':
+                    aVal = a.name;
+                    bVal = b.name;
+                    break;
+                case 'group':
+                    aVal = a.group;
+                    bVal = b.group;
+                    break;
+                case 'baseline':
+                    aVal = a.baselineValue || 0;
+                    bVal = b.baselineValue || 0;
+                    break;
+                case 'facet':
+                    aVal = a.facetValue || 0;
+                    bVal = b.facetValue || 0;
+                    break;
+                case 'ratio':
+                    aVal = a.ratio || 0;
+                    bVal = b.ratio || 0;
+                    break;
+                default: return 0;
+            }
+            const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            return sortDir === 'asc' ? comparison : -comparison;
+        });
+        return sorted;
+    }, [overviewData, sortBy, sortDir]);
+    // Compute summary stats
+    const stats = useMemo(() => {
+        if (overviewData.length === 0) {
+            return { total: 0, faster: 0, slower: 0, neutral: 0, avgRatio: 1 };
+        }
+        return {
+            total: overviewData.length,
+            faster: overviewData.filter(d => d.ratio < 1).length,
+            slower: overviewData.filter(d => d.ratio > 1.02).length,
+            neutral: overviewData.filter(d => d.ratio >= 1 && d.ratio <= 1.02).length,
+            avgRatio: overviewData.reduce((sum, d) => sum + d.ratio, 0) / overviewData.length
+        };
+    }, [overviewData]);
+    const handleSort = (column) => {
+        if (sortBy === column) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        }
+        else {
+            setSortBy(column);
+            setSortDir('asc');
+        }
     };
-  }, [overviewData]);
-
-  const handleSort = (column) => {
-    if (sortBy === column) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDir('asc');
-    }
-  };
-
-  const metricDef = metrics.find(m => m.id === selectedMetric);
-
-  // Get labels for baseline/primary targets
-  const baselineLabel = activeFormatConfig?.baseline_target || 'baseline';
-  const primaryLabel = activeFormatConfig?.primary_target || 'facet';
-
-  if (overviewData.length === 0) {
-    const totalBenchmarks = benchmarks.length;
-    return html`
+    const metricDef = metrics.find(m => m.id === selectedMetric);
+    // Get labels for baseline/primary targets
+    const baselineLabel = activeFormatConfig?.baseline_target || 'baseline';
+    const primaryLabel = activeFormatConfig?.primary_target || 'facet';
+    if (overviewData.length === 0) {
+        const totalBenchmarks = benchmarks.length;
+        return html `
       <div class="no-data">
         <p>No benchmark data available for comparison.</p>
         <p style="color: var(--muted); font-size: 13px; margin-top: 0.5rem;">
@@ -1595,9 +1318,8 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
         </p>
       </div>
     `;
-  }
-
-  return html`
+    }
+    return html `
     <div class="overview-view">
       <h2 class="case-title">Overview: All Benchmarks</h2>
 
@@ -1619,20 +1341,20 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
       </div>
 
       <div class="overview-chart-container">
-        ${vizMode === 'grouped' && html`
+        ${vizMode === 'grouped' && html `
           <${GroupedBarsChart}
             data=${sortedData}
             metricDef=${metricDef}
             onSelectBenchmark=${onSelectBenchmark}
           />
         `}
-        ${vizMode === 'diverging' && html`
+        ${vizMode === 'diverging' && html `
           <${DivergingBarsChart}
             data=${sortedData}
             onSelectBenchmark=${onSelectBenchmark}
           />
         `}
-        ${vizMode === 'dots' && html`
+        ${vizMode === 'dots' && html `
           <${DotPlotChart}
             data=${sortedData}
             metricDef=${metricDef}
@@ -1654,24 +1376,21 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
     </div>
   `;
 }
-
 // ============================================================================
 // App Router
 // ============================================================================
-
 // Wrapper to extract params for ReportPage
 function ReportRoute() {
-  const params = useParams();
-  return html`<${ReportPage}
+    const params = useParams();
+    return html `<${ReportPage}
     branch=${params.branch}
     commit=${params.commit}
     operation=${params.operation || 'deserialize'}
     selectedCase=${params.case || 'overview'}
   />`;
 }
-
 function NotFound() {
-  return html`
+    return html `
     <div class="not-found">
       <h1>404</h1>
       <p>Page not found</p>
@@ -1679,9 +1398,8 @@ function NotFound() {
     </div>
   `;
 }
-
 function App() {
-  return html`
+    return html `
     <${HashRouter}>
       <${Route} path="/" component=${IndexPage} />
       <${Route} path="/runs/:branch/:commit/:operation?/:case?" component=${ReportRoute} />
@@ -1689,11 +1407,9 @@ function App() {
     <//>
   `;
 }
-
 // ============================================================================
 // Styles
 // ============================================================================
-
 const styles = `
 /* CSS Variables for charts */
 :root {
@@ -2291,13 +2007,10 @@ button, input, select, textarea {
   .overview-summary { flex-direction: column; gap: 1rem; }
 }
 `;
-
 // ============================================================================
 // Bootstrap
 // ============================================================================
-
 const styleEl = document.createElement('style');
 styleEl.textContent = styles;
 document.head.appendChild(styleEl);
-
-render(html`<${App} />`, document.getElementById('app'));
+render(html `<${App} />`, document.getElementById('app'));
