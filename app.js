@@ -1,16 +1,211 @@
 // Unified SPA for perf.facet.rs
 // Hash-based routing: /#/ (index), /#/runs/:branch/:commit/:op (report)
+//
+// Types are generated from tools/benchmark-analyzer/src/run_types.rs
+// See run-types.d.ts for the TypeScript interfaces
 
-import { h, render } from 'https://esm.sh/preact@10.19.3';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'https://esm.sh/preact@10.19.3/hooks';
+// @ts-ignore - ESM imports from CDN
+import { h, render, VNode, ComponentChildren } from 'https://esm.sh/preact@10.19.3';
+// @ts-ignore - ESM imports from CDN
+import { useState, useEffect, useCallback, useMemo, useRef, StateUpdater } from 'https://esm.sh/preact@10.19.3/hooks';
+// @ts-ignore - ESM imports from CDN
 import { Router, Route, useParams } from 'https://esm.sh/wouter-preact@3.8.1?deps=preact@10.19.3';
+// @ts-ignore - ESM imports from CDN
 import { useHashLocation } from 'https://esm.sh/wouter-preact@3.8.1/use-hash-location?deps=preact@10.19.3';
+// @ts-ignore - ESM imports from CDN
 import htm from 'https://esm.sh/htm@3.1.1';
 
 const html = htm.bind(h);
 
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+// Run data types (from run-types.d.ts, inlined for reference)
+interface RunJson {
+  schema?: string;
+  run: RunMeta;
+  defaults?: RunDefaults;
+  catalog?: RunCatalog;
+  results: RunResults;
+}
+
+interface RunMeta {
+  run_id: string;
+  branch_key: string;
+  branch_original?: string;
+  sha?: string;
+  commit?: string;
+  short?: string;
+  commit_short?: string;
+  timestamp?: string;
+  generated_at?: string;
+  timestamp_unix?: number;
+  commit_message: string;
+  pr_number?: string;
+  pr_title?: string;
+}
+
+interface RunDefaults {
+  operation: string;
+  metric: string;
+  baseline_target: string;
+  primary_target: string;
+  comparison_mode: string;
+}
+
+interface RunCatalog {
+  formats_order: string[];
+  formats: Record<string, FormatDef>;
+  groups_order: string[];
+  groups: Record<string, GroupDef>;
+  benchmarks: Record<string, BenchmarkDef>;
+  targets: Record<string, TargetDef>;
+  metrics: Record<string, MetricDef>;
+}
+
+interface FormatDef {
+  key: string;
+  label: string;
+  baseline_target: string;
+  primary_target: string;
+}
+
+interface GroupDef {
+  label: string;
+  benchmarks_order: string[];
+}
+
+interface BenchmarkDef {
+  key: string;
+  label: string;
+  group: string;
+  format: string;
+  targets_order: string[];
+  metrics_order: string[];
+}
+
+interface TargetDef {
+  key: string;
+  label: string;
+  kind: string;
+}
+
+interface MetricDef {
+  key: string;
+  label: string;
+  unit: string;
+  better: string;
+}
+
+interface RunResults {
+  values: Record<string, BenchmarkOps>;
+  errors: RunErrors;
+}
+
+interface BenchmarkOps {
+  deserialize: Record<string, TargetMetrics | null>;
+  serialize: Record<string, TargetMetrics | null>;
+}
+
+interface TargetMetrics {
+  instructions?: number;
+  estimated_cycles?: number;
+  time_median_ns?: number;
+  l1_hits?: number;
+  ll_hits?: number;
+  ram_hits?: number;
+  total_read_write?: number;
+  tier2_attempts?: number;
+  tier2_successes?: number;
+  tier2_compile_unsupported?: number;
+  tier2_runtime_unsupported?: number;
+  tier2_runtime_error?: number;
+  tier1_fallbacks?: number;
+}
+
+interface RunErrors {
+  _parse_failures?: {
+    divan: string[];
+    gungraun: string[];
+  };
+}
+
+// Index data types
+interface IndexData {
+  timeline?: string[];
+  commits?: Record<string, CommitData>;
+  baseline?: BaselineData;
+}
+
+interface CommitData {
+  sha: string;
+  short?: string;
+  subject?: string;
+  branches_present?: string[];
+  timestamp_unix?: number;
+  summary?: CommitSummary;
+  headline?: HeadlineData;
+  runs?: Record<string, RunRef>;
+  primary_default?: { branch_key: string };
+}
+
+interface CommitSummary {
+  headline?: HeadlineData;
+  highlights?: {
+    regressions?: HighlightItem[];
+    improvements?: HighlightItem[];
+  };
+}
+
+interface HeadlineData {
+  ratio?: number;
+  delta_vs_baseline?: number;
+  delta_direction?: string;
+}
+
+interface HighlightItem {
+  benchmark: string;
+  delta_percent: number;
+}
+
+interface RunRef {
+  url?: string;
+}
+
+interface BaselineData {
+  commit_sha?: string;
+  branch_key?: string;
+  headline?: HeadlineData;
+}
+
+// Component prop types
+interface HashRouterProps {
+  children: ComponentChildren;
+}
+
+interface LinkProps {
+  href: string;
+  children: ComponentChildren;
+  class?: string;
+  [key: string]: any;
+}
+
+interface DropdownItem {
+  value: string;
+  label: string;
+  meta?: string;
+}
+
+interface DropdownProps {
+  trigger: ComponentChildren;
+  items: DropdownItem[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
 // Hash-based router wrapper
-function HashRouter({ children }) {
+function HashRouter({ children }: HashRouterProps): VNode {
   return html`<${Router} hook=${useHashLocation}>${children}<//>`;
 }
 
@@ -18,10 +213,10 @@ function HashRouter({ children }) {
 // Data Layer
 // ============================================================================
 
-const runCache = new Map();
-let indexDataCache = null;
+const runCache = new Map<string, RunJson>();
+let indexDataCache: IndexData | null = null;
 
-async function fetchIndexData() {
+async function fetchIndexData(): Promise<IndexData | null> {
   if (indexDataCache) return indexDataCache;
 
   try {
@@ -36,13 +231,13 @@ async function fetchIndexData() {
   }
 }
 
-async function fetchRunData(url) {
-  if (runCache.has(url)) return runCache.get(url);
+async function fetchRunData(url: string): Promise<RunJson | null> {
+  if (runCache.has(url)) return runCache.get(url) || null;
 
   try {
     const response = await fetch(url);
     if (!response.ok) return null;
-    const data = await response.json();
+    const data: RunJson = await response.json();
     runCache.set(url, data);
     return data;
   } catch (e) {
@@ -55,18 +250,42 @@ async function fetchRunData(url) {
 // Utility Functions
 // ============================================================================
 
-function formatNumber(n) {
+interface TierIndicator {
+  icon: string;
+  label: string;
+  title: string;
+  color: string;
+}
+
+interface SpeedupResult {
+  text: string;
+  label: string;
+  color: string | null;
+}
+
+interface DeltaResult {
+  text: string;
+  color: string;
+  icon: string;
+}
+
+interface RatioResult {
+  text: string;
+  color: string | null;
+}
+
+function formatNumber(n: number | null | undefined): string {
   if (n === null || n === undefined) return '—';
   return n.toLocaleString();
 }
 
-function formatRatio(ratio) {
+function formatRatio(ratio: number | null | undefined): string {
   if (!ratio || ratio <= 0) return '—';
   return `${ratio.toFixed(2)}×`;
 }
 
 // Format tier usage indicators for JIT targets
-function getTierIndicator(targetData, targetId) {
+function getTierIndicator(targetData: TargetMetrics | null | undefined, targetId: string): TierIndicator | null {
   // Only show tier indicators for jit_t2 targets
   if (!targetId.includes('jit_t2')) return null;
 
@@ -102,25 +321,25 @@ function getTierIndicator(targetData, targetId) {
   return null;
 }
 
-// Format ratio vs serde with proper semantics and epsilon for neutrality
-// ratio = serde_instructions / facet_instructions
+// Format ratio vs baseline with proper semantics and epsilon for neutrality
+// ratio = baseline_instructions / facet_instructions
 // ratio > 1 means facet uses fewer instructions = faster
 // ratio < 1 means facet uses more instructions = slower
 // ratio ≈ 1 means roughly the same
-function formatSpeedupVsSerde(ratio) {
+function formatSpeedupVsBaseline(ratio, baselineLabel = 'baseline') {
   if (!ratio || ratio <= 0) return { text: '—', label: '', color: null };
 
-  // Show ratio directly: 0.2× means 20% of serde's speed, 2× means twice as fast
+  // Show ratio directly: 0.2× means 20% of baseline's speed, 2× means twice as fast
   // Higher is always better, no confusing "slower"/"faster" language
   const EPSILON = 0.03;
 
   if (Math.abs(ratio - 1) < EPSILON) {
-    return { text: '~1×', label: 'serde', color: 'var(--neutral)' };
+    return { text: '~1×', label: baselineLabel, color: 'var(--neutral)' };
   }
 
-  // Color based on whether we're faster or slower than serde
+  // Color based on whether we're faster or slower than baseline
   const color = ratio >= 1 ? 'var(--good)' : 'var(--muted)';
-  return { text: `${ratio.toFixed(2)}×`, label: 'serde', color };
+  return { text: `${ratio.toFixed(2)}×`, label: baselineLabel, color };
 }
 
 function formatDelta(delta) {
@@ -164,7 +383,7 @@ function formatMetricValue(value, metricId) {
   return formatNumber(Math.round(value));
 }
 
-function formatRatioVsSerde(ratio) {
+function formatRatioVsBaseline(ratio) {
   if (ratio === null || ratio === undefined) return { text: '—', color: null };
   const EPSILON = 0.02; // 2% tolerance for "same"
   if (Math.abs(ratio - 1) < EPSILON) {
@@ -178,10 +397,10 @@ function formatRatioVsSerde(ratio) {
 }
 
 // Find which group a benchmark belongs to
-function findBenchmarkGroup(benchId, catalog) {
+function findBenchmarkGroup(benchId: string, catalog: RunCatalog | undefined | null): string {
   if (!catalog?.groups) return 'other';
 
-  for (const [groupId, group] of Object.entries(catalog.groups)) {
+  for (const [groupId, group] of Object.entries(catalog.groups) as [string, GroupDef][]) {
     if (group.benchmarks_order?.includes(benchId)) {
       return groupId;
     }
@@ -291,7 +510,7 @@ function IndexPage() {
     <div class="index-page">
       <header class="page-header">
         <h1>facet performance benchmarks</h1>
-        <p class="subtitle">Comparing facet-format+jit vs serde_json (instructions, deserialize)</p>
+        <p class="subtitle">Comparing facet vs standard libraries (instructions, deserialize)</p>
         <input
           type="text"
           class="filter-input"
@@ -302,7 +521,7 @@ function IndexPage() {
       </header>
 
       ${baseline && baselineRatio > 0 ? (() => {
-        const speedup = formatSpeedupVsSerde(baselineRatio);
+        const speedup = formatSpeedupVsBaseline(baselineRatio);
         return html`
           <div class="baseline-banner">
             <span class="baseline-label">Baseline: main</span>
@@ -394,10 +613,10 @@ function CommitRow({ commit, baseline, baselineRatio }) {
         </div>
         <div class="commit-result">
           ${ratio > 0 ? (() => {
-            const speedup = formatSpeedupVsSerde(ratio);
+            const speedup = formatSpeedupVsBaseline(ratio);
             return html`
               <span class="result-value" style=${speedup.color ? `color: ${speedup.color}` : ''}>${speedup.text}</span>
-              <span class="result-label">${speedup.label.replace(' than serde', '')}</span>
+              <span class="result-label">${speedup.label}</span>
             `;
           })() : html`<span class="result-na">—</span>`}
           ${deltaInfo && !isBaseline && html`
@@ -463,6 +682,7 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
   const [error, setError] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState('instructions');
   const [compareMode, setCompareMode] = useState('none'); // 'none' | 'baseline' | 'parent'
+  const [selectedFormat, setSelectedFormat] = useState(null); // null = auto-detect first format
   const [, navigate] = useHashLocation();
 
   const op = operation || 'deserialize';
@@ -524,35 +744,87 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
   const catalog = runData.catalog;
   const isNewSchema = runData.schema === 'run-v1' && catalog;
 
+  // Format handling - get available formats from catalog
+  const formats = useMemo(() => {
+    if (!isNewSchema || !catalog?.formats_order) return [];
+    return catalog.formats_order.map(key => ({
+      key,
+      ...catalog.formats?.[key]
+    })).filter(f => f.label);
+  }, [isNewSchema, catalog]);
+
+  // Auto-select first format if none selected
+  const activeFormat = selectedFormat || formats[0]?.key || null;
+
+  // Get format config for the active format
+  const activeFormatConfig = activeFormat ? catalog?.formats?.[activeFormat] : null;
+
   // Build metrics list from catalog or fall back to old schema
   const metrics = isNewSchema
-    ? Object.entries(catalog.metrics || {}).map(([id, m]) => ({ id, label: m.label, unit: m.unit, better: m.better }))
+    ? (Object.entries(catalog.metrics || {}) as [string, MetricDef][]).map(([id, m]) => ({ id, label: m.label, unit: m.unit, better: m.better }))
     : (runData.schema?.metrics || []);
 
-  // Build targets list from catalog or fall back
-  const targets = isNewSchema
-    ? Object.entries(catalog.targets || {}).map(([id, t]) => ({ id, label: t.label, kind: t.kind }))
-    : (runData.ordering?.targets
-        ? runData.ordering.targets.map(id => runData.schema?.targets?.find(t => t.id === id) || { id, label: id })
-        : runData.schema?.targets || []);
+  // Build targets list from catalog or fall back, filtered by format
+  const targets = useMemo(() => {
+    if (isNewSchema) {
+      // Get all targets from catalog
+      const allTargets = (Object.entries(catalog.targets || {}) as [string, TargetDef][]).map(([id, t]) => ({ id, label: t.label, kind: t.kind }));
 
-  // Build groups from catalog or fall back
-  const groups = isNewSchema
-    ? (catalog.groups_order || []).map(groupId => {
+      // If no format selected, return all targets
+      if (!activeFormat) return allTargets;
+
+      // Get targets for this format from the format's benchmarks
+      // Each benchmark has a targets_order that lists applicable targets
+      const formatBenchmarks = (Object.values(catalog.benchmarks || {}) as BenchmarkDef[]).filter(b => b.format === activeFormat);
+      if (formatBenchmarks.length === 0) return allTargets;
+
+      // Collect unique target IDs from format's benchmarks
+      const formatTargetIds = new Set<string>();
+      formatBenchmarks.forEach(b => {
+        (b.targets_order || []).forEach(t => formatTargetIds.add(t));
+      });
+
+      // Filter and order targets
+      return allTargets.filter(t => formatTargetIds.has(t.id));
+    } else {
+      return runData.ordering?.targets
+        ? runData.ordering.targets.map(id => runData.schema?.targets?.find(t => t.id === id) || { id, label: id })
+        : runData.schema?.targets || [];
+    }
+  }, [isNewSchema, catalog, activeFormat, runData]);
+
+  // Build groups from catalog or fall back, filtered by selected format
+  const groups = useMemo(() => {
+    if (isNewSchema) {
+      return (catalog.groups_order || []).map(groupId => {
         const group = catalog.groups?.[groupId] || {};
+        // Filter benchmarks by format
+        const filteredBenchmarks = (group.benchmarks_order || []).filter(benchId => {
+          if (!activeFormat) return true;
+          const benchDef = catalog.benchmarks?.[benchId];
+          return benchDef?.format === activeFormat;
+        });
         return {
           group_id: groupId,
           label: group.label || sectionLabel(groupId),
-          cases: (group.benchmarks_order || []).map(name => ({ case_id: name, label: name }))
+          cases: filteredBenchmarks.map(name => {
+            const benchDef = catalog.benchmarks?.[name];
+            // Display label without format prefix for cleaner UI
+            const displayLabel = benchDef?.label || name;
+            return { case_id: name, label: displayLabel };
+          })
         };
-      })
-    : (runData.ordering?.sections
+      }).filter(g => g.cases.length > 0); // Hide empty groups
+    } else {
+      return runData.ordering?.sections
         ? runData.ordering.sections.map(section => ({
             group_id: section,
             label: sectionLabel(section),
             cases: (runData.ordering.benchmarks?.[section] || []).map(name => ({ case_id: name, label: name }))
           }))
-        : runData.groups || []);
+        : runData.groups || [];
+    }
+  }, [isNewSchema, catalog, runData, activeFormat]);
 
   const branchItems = indexData?.branches ?
     Object.keys(indexData.branches).map(b => ({ value: b, label: b })) : [];
@@ -599,6 +871,14 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
           />
         </div>
         <div class="nav-right">
+          ${formats.length > 1 && html`
+            <${Dropdown}
+              trigger=${activeFormatConfig?.label || activeFormat || 'Format'}
+              items=${formats.map(f => ({ value: f.key, label: f.label }))}
+              value=${activeFormat}
+              onChange=${setSelectedFormat}
+            />
+          `}
           <${Dropdown}
             trigger=${compareModeLabel}
             items=${compareItems}
@@ -658,6 +938,8 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
               operation=${op}
               isNewSchema=${isNewSchema}
               onSelectBenchmark=${navigateToCase}
+              activeFormat=${activeFormat}
+              activeFormatConfig=${activeFormatConfig}
             />
           ` : selectedCase && html`
             <${CaseView}
@@ -670,6 +952,8 @@ function ReportPage({ branch, commit, operation, selectedCase }) {
               operation=${op}
               compareMode=${compareMode}
               isNewSchema=${isNewSchema}
+              activeFormatConfig=${activeFormatConfig}
+              catalog=${catalog}
             />
           `}
         </main>
@@ -688,10 +972,16 @@ function sectionLabel(section) {
   return labels[section] || section;
 }
 
-function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMetric, operation, compareMode, isNewSchema }) {
+function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMetric, operation, compareMode, isNewSchema, activeFormatConfig, catalog }) {
   if (!caseData) return html`<div class="no-data">No data for ${caseId}</div>`;
 
   const metricInfo = metrics.find(m => m.id === selectedMetric);
+
+  // Get the format for this benchmark to determine baseline target
+  const benchFormat = catalog?.benchmarks?.[caseId]?.format;
+  const formatConfig = benchFormat ? catalog?.formats?.[benchFormat] : activeFormatConfig;
+  const baselineTargetId = formatConfig?.baseline_target || 'serde_json';
+  const baselineTargetLabel = baselineTargetId;
 
   // Helper to get metric value from either schema
   const getMetricValue = (data, targetId, metricId) => {
@@ -707,7 +997,7 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
     }
   };
 
-  const baselineValue = getMetricValue(caseData, 'serde_json', selectedMetric);
+  const baselineValue = getMetricValue(caseData, baselineTargetId, selectedMetric);
 
   // Compute chart data (include all targets, even missing ones)
   const chartData = targets
@@ -737,7 +1027,7 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
           <tr>
             <th>Target</th>
             <th>${metricInfo?.label || selectedMetric}</th>
-            <th>vs serde_json</th>
+            <th>vs ${baselineTargetLabel}</th>
             ${compareMode !== 'none' && html`<th>Δ vs ${compareMode}</th>`}
           </tr>
         </thead>
@@ -747,7 +1037,7 @@ function CaseView({ caseId, caseData, compareData, targets, metrics, selectedMet
             const isMissing = value === null;
 
             const ratio = value && baselineValue ? value / baselineValue : null;
-            const ratioInfo = formatRatioVsSerde(ratio);
+            const ratioInfo = formatRatioVsBaseline(ratio);
 
             // Comparison delta
             const compareValue = getMetricValue(compareData, target.id, selectedMetric);
@@ -815,7 +1105,7 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
       <svg class="bar-chart" viewBox="0 0 ${labelWidth + chartWidth + 140} ${height}" preserveAspectRatio="xMinYMin meet">
         ${data.map((d, i) => {
           const y = i * (barHeight + gap) + 10;
-          const isSerde = d.target.id === 'serde_json';
+          const isSerde = d.target.kind === 'baseline';
 
           // Handle missing data
           if (d.isMissing) {
@@ -839,12 +1129,12 @@ function BarChart({ data, maxValue, baselineValue, metricInfo, selectedMetric, c
           const barWidth = maxValue > 0 ? (d.value / maxValue) * chartWidth : 0;
           const compareWidth = maxValue > 0 && d.compareValue ? (d.compareValue / maxValue) * chartWidth : 0;
 
-          // Color based on whether this is serde (baseline) or facet
-          const barColor = isSerde ? 'var(--chart-serde)' : 'var(--chart-facet)';
+          // Color based on whether this is baseline or facet
+          const barColor = isSerde ? 'var(--chart-baseline)' : 'var(--chart-facet)';
 
-          // Compute ratio vs serde
+          // Compute ratio vs baseline
           const ratio = baselineValue && d.value ? d.value / baselineValue : null;
-          const ratioInfo = formatRatioVsSerde(ratio);
+          const ratioInfo = formatRatioVsBaseline(ratio);
 
           return html`
             <g key=${d.target.id}>
@@ -946,8 +1236,8 @@ function MetricsDetail({ caseData, targets, metrics, operation, isNewSchema }) {
 // Overview Components
 // ============================================================================
 
-function OverviewSummary({ stats }) {
-  const avgRatioInfo = formatRatioVsSerde(stats.avgRatio);
+function OverviewSummary({ stats, baselineLabel = 'baseline' }) {
+  const avgRatioInfo = formatRatioVsBaseline(stats.avgRatio);
 
   return html`
     <div class="overview-summary">
@@ -974,7 +1264,7 @@ function OverviewSummary({ stats }) {
         </div>
       </div>
       <div class="overview-stat">
-        <div class="overview-stat-label">Avg vs serde_json</div>
+        <div class="overview-stat-label">Avg vs ${baselineLabel}</div>
         <div class="overview-stat-value" style="color: ${avgRatioInfo.color}">
           ${avgRatioInfo.text}
         </div>
@@ -991,13 +1281,13 @@ function GroupedBarsChart({ data, metricDef, onSelectBenchmark }) {
   const gap = 4;
   const height = data.length * (barHeight + gap) + 20;
 
-  const maxValue = Math.max(...data.map(d => Math.max(d.serdeValue, d.facetValue)));
+  const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
 
   return html`
     <svg class="overview-chart" viewBox="0 0 ${labelWidth + chartWidth + 100} ${height}">
       ${data.map((d, i) => {
         const y = i * (barHeight + gap) + 10;
-        const serdeWidth = (d.serdeValue / maxValue) * chartWidth;
+        const baselineWidth = (d.baselineValue / maxValue) * chartWidth;
         const facetWidth = (d.facetValue / maxValue) * chartWidth;
         const barH = (barHeight - gap) / 2;
 
@@ -1006,8 +1296,8 @@ function GroupedBarsChart({ data, metricDef, onSelectBenchmark }) {
             <text x=${labelWidth - 8} y=${y + barHeight / 2 + 4} text-anchor="end" class="chart-label">
               ${d.name}
             </text>
-            <!-- serde bar -->
-            <rect x=${labelWidth} y=${y} width=${serdeWidth} height=${barH} fill="var(--chart-serde)" rx="2" />
+            <!-- baseline bar -->
+            <rect x=${labelWidth} y=${y} width=${baselineWidth} height=${barH} fill="var(--chart-baseline)" rx="2" />
             <!-- facet bar -->
             <rect x=${labelWidth} y=${y + barH + 2} width=${facetWidth} height=${barH}
               fill=${d.ratio < 1 ? 'var(--good)' : 'var(--bad)'} rx="2" />
@@ -1069,13 +1359,13 @@ function DotPlotChart({ data, metricDef, onSelectBenchmark }) {
   const gap = 4;
   const height = data.length * (barHeight + gap) + 20;
 
-  const maxValue = Math.max(...data.map(d => Math.max(d.serdeValue, d.facetValue)));
+  const maxValue = Math.max(...data.map(d => Math.max(d.baselineValue, d.facetValue)));
 
   return html`
     <svg class="overview-chart" viewBox="0 0 ${labelWidth + chartWidth + 100} ${height}">
       ${data.map((d, i) => {
         const y = i * (barHeight + gap) + 10 + barHeight / 2;
-        const serdeX = labelWidth + (d.serdeValue / maxValue) * chartWidth;
+        const baselineX = labelWidth + (d.baselineValue / maxValue) * chartWidth;
         const facetX = labelWidth + (d.facetValue / maxValue) * chartWidth;
 
         return html`
@@ -1084,11 +1374,11 @@ function DotPlotChart({ data, metricDef, onSelectBenchmark }) {
               ${d.name}
             </text>
             <!-- Connecting line -->
-            <line x1=${serdeX} y1=${y} x2=${facetX} y2=${y}
+            <line x1=${baselineX} y1=${y} x2=${facetX} y2=${y}
               stroke=${d.ratio < 1 ? 'var(--good)' : 'var(--bad)'}
               stroke-width="2" opacity="0.3" />
-            <!-- serde dot (baseline) -->
-            <circle cx=${serdeX} cy=${y} r="4" fill="var(--chart-serde)" />
+            <!-- baseline dot -->
+            <circle cx=${baselineX} cy=${y} r="4" fill="var(--chart-baseline)" />
             <!-- facet dot -->
             <circle cx=${facetX} cy=${y} r="5"
               fill=${d.ratio < 1 ? 'var(--good)' : 'var(--bad)'}
@@ -1100,7 +1390,7 @@ function DotPlotChart({ data, metricDef, onSelectBenchmark }) {
   `;
 }
 
-function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metricDef }) {
+function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metricDef, baselineLabel, primaryLabel }) {
   const sortIndicator = (col) => {
     if (sortBy !== col) return '';
     return sortDir === 'asc' ? ' ▲' : ' ▼';
@@ -1116,11 +1406,11 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
           <th class="sortable" onClick=${() => onSort('group')}>
             Group${sortIndicator('group')}
           </th>
-          <th class="sortable numeric" onClick=${() => onSort('serde')}>
-            serde_json${sortIndicator('serde')}
+          <th class="sortable numeric" onClick=${() => onSort('baseline')}>
+            ${baselineLabel}${sortIndicator('baseline')}
           </th>
           <th class="sortable numeric" onClick=${() => onSort('facet')}>
-            facet-format+jit${sortIndicator('facet')}
+            ${primaryLabel}${sortIndicator('facet')}
           </th>
           <th class="sortable numeric" onClick=${() => onSort('ratio')}>
             Ratio${sortIndicator('ratio')}
@@ -1129,7 +1419,7 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
       </thead>
       <tbody>
         ${data.map(d => {
-          const ratioInfo = formatRatioVsSerde(d.ratio);
+          const ratioInfo = formatRatioVsBaseline(d.ratio);
           return html`
             <tr class="overview-row" key=${d.id}>
               <td class="bench-name-cell">
@@ -1143,7 +1433,7 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
                 </span>
               </td>
               <td class="value-cell numeric">
-                ${formatMetricValue(d.serdeValue, metricDef?.id)}
+                ${formatMetricValue(d.baselineValue, metricDef?.id)}
               </td>
               <td class="value-cell numeric">
                 ${formatMetricValue(d.facetValue, metricDef?.id)}
@@ -1166,61 +1456,86 @@ function OverviewTable({ data, sortBy, sortDir, onSort, onSelectBenchmark, metri
   `;
 }
 
-function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema, onSelectBenchmark }) {
+function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema, onSelectBenchmark, activeFormat, activeFormatConfig }) {
   const [sortBy, setSortBy] = useState('ratio');
   const [sortDir, setSortDir] = useState('asc'); // asc = best speedups first
   const [vizMode, setVizMode] = useState('grouped'); // 'grouped' | 'diverging' | 'dots'
 
-  // Extract benchmarks - handle both old and new schema
-  const benchmarks = isNewSchema
-    ? Object.keys(runData.results?.values || {})
-    : Object.keys(runData.results || {});
+  // Extract benchmarks - handle both old and new schema, filtered by format
+  const benchmarks = useMemo(() => {
+    if (isNewSchema) {
+      const allBenchmarks = Object.keys(runData.results?.values || {});
+      if (!activeFormat) return allBenchmarks;
+      // Filter by format
+      return allBenchmarks.filter(benchId => {
+        const benchDef = runData.catalog?.benchmarks?.[benchId];
+        return benchDef?.format === activeFormat;
+      });
+    } else {
+      return Object.keys(runData.results || {});
+    }
+  }, [isNewSchema, runData, activeFormat]);
+
+  // Get baseline and primary targets for current format
+  const baselineTarget = activeFormatConfig?.baseline_target || 'serde_json';
+  const primaryTarget = activeFormatConfig?.primary_target || 'facet_json_t2';
 
   const overviewData = useMemo(() => {
     const data = benchmarks.map(benchId => {
-      let serdeValue, facetValue;
+      let baselineValue, facetValue;
 
       if (isNewSchema) {
         // New schema: results.values[benchmark][operation][target][metric]
         const benchData = runData.results.values[benchId];
-        serdeValue = benchData?.[operation]?.serde_json?.[selectedMetric];
-        // Try tier-2 JIT first, then tier-1, then t0 as fallback
-        facetValue = benchData?.[operation]?.facet_json_t2?.[selectedMetric]
-          || benchData?.[operation]?.facet_json_t1?.[selectedMetric]
-          || benchData?.[operation]?.facet_json_t0?.[selectedMetric];
+        baselineValue = benchData?.[operation]?.[baselineTarget]?.[selectedMetric];
+        // Use primary target from format config, with fallbacks for JIT tiers
+        facetValue = benchData?.[operation]?.[primaryTarget]?.[selectedMetric];
+        // Fallback to lower tiers if primary not available (for JSON with t2/t1/t0)
+        if (facetValue === undefined && primaryTarget.includes('_t2')) {
+          const baseTarget = primaryTarget.replace('_t2', '');
+          facetValue = benchData?.[operation]?.[`${baseTarget}_t1`]?.[selectedMetric]
+            || benchData?.[operation]?.[`${baseTarget}_t0`]?.[selectedMetric];
+        }
       } else {
         // Old schema: results[benchmark].targets[target].ops[operation].metrics[metric]
         const benchData = runData.results[benchId];
-        const serdeResult = benchData?.targets?.serde_json?.ops?.[operation];
-        // Try tier-2 JIT first, then tier-1, then t0 as fallback
-        const facetResult = benchData?.targets?.facet_json_t2?.ops?.[operation]
-          || benchData?.targets?.facet_json_t1?.ops?.[operation]
-          || benchData?.targets?.facet_json_t0?.ops?.[operation];
-        serdeValue = serdeResult?.ok ? serdeResult?.metrics?.[selectedMetric] : null;
+        const baselineResult = benchData?.targets?.[baselineTarget]?.ops?.[operation];
+        // Try primary target first, then fallback tiers if it's a JIT target
+        let facetResult = benchData?.targets?.[primaryTarget]?.ops?.[operation];
+        if (!facetResult && primaryTarget.includes('_t2')) {
+          const baseTarget = primaryTarget.replace('_t2', '');
+          facetResult = benchData?.targets?.[`${baseTarget}_t1`]?.ops?.[operation]
+            || benchData?.targets?.[`${baseTarget}_t0`]?.ops?.[operation];
+        }
+        baselineValue = baselineResult?.ok ? baselineResult?.metrics?.[selectedMetric] : null;
         facetValue = facetResult?.ok ? facetResult?.metrics?.[selectedMetric] : null;
       }
 
-      const ratio = serdeValue && facetValue ? facetValue / serdeValue : null;
+      const ratio = baselineValue && facetValue ? facetValue / baselineValue : null;
       const group = isNewSchema
         ? findBenchmarkGroup(benchId, runData.catalog)
-        : findBenchmarkGroup(benchId, { groups: runData.groups?.reduce((acc, g) => {
-            acc[g.group_id] = { benchmarks_order: g.cases?.map(c => c.case_id) };
+        : findBenchmarkGroup(benchId, { groups: runData.groups?.reduce((acc: Record<string, GroupDef>, g: any) => {
+            acc[g.group_id] = { label: g.group_id, benchmarks_order: g.cases?.map((c: any) => c.case_id) || [] };
             return acc;
-          }, {}) });
+          }, {}) } as RunCatalog);
+
+      // Get display name (label without format prefix)
+      const benchDef = runData.catalog?.benchmarks?.[benchId];
+      const displayName = benchDef?.label || benchId;
 
       return {
         id: benchId,
-        name: benchId,
+        name: displayName,
         group,
-        serdeValue,
+        baselineValue,
         facetValue,
         ratio,
-        hasBothValues: serdeValue !== null && facetValue !== null
+        hasBothValues: baselineValue !== null && facetValue !== null
       };
     }).filter(d => d.hasBothValues); // Only show benchmarks with both values
 
     return data;
-  }, [runData, selectedMetric, operation, benchmarks, isNewSchema]);
+  }, [runData, selectedMetric, operation, benchmarks, isNewSchema, baselineTarget, primaryTarget]);
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -1230,7 +1545,7 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
       switch(sortBy) {
         case 'name': aVal = a.name; bVal = b.name; break;
         case 'group': aVal = a.group; bVal = b.group; break;
-        case 'serde': aVal = a.serdeValue || 0; bVal = b.serdeValue || 0; break;
+        case 'baseline': aVal = a.baselineValue || 0; bVal = b.baselineValue || 0; break;
         case 'facet': aVal = a.facetValue || 0; bVal = b.facetValue || 0; break;
         case 'ratio': aVal = a.ratio || 0; bVal = b.ratio || 0; break;
         default: return 0;
@@ -1266,13 +1581,17 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
 
   const metricDef = metrics.find(m => m.id === selectedMetric);
 
+  // Get labels for baseline/primary targets
+  const baselineLabel = activeFormatConfig?.baseline_target || 'baseline';
+  const primaryLabel = activeFormatConfig?.primary_target || 'facet';
+
   if (overviewData.length === 0) {
     const totalBenchmarks = benchmarks.length;
     return html`
       <div class="no-data">
         <p>No benchmark data available for comparison.</p>
         <p style="color: var(--muted); font-size: 13px; margin-top: 0.5rem;">
-          Found ${totalBenchmarks} benchmark(s), but none have both serde_json and facet results for ${operation}.
+          Found ${totalBenchmarks} benchmark(s), but none have both ${baselineLabel} and ${primaryLabel} results for ${operation}.
         </p>
       </div>
     `;
@@ -1282,7 +1601,7 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
     <div class="overview-view">
       <h2 class="case-title">Overview: All Benchmarks</h2>
 
-      <${OverviewSummary} stats=${stats} />
+      <${OverviewSummary} stats=${stats} baselineLabel=${baselineLabel} />
 
       <div class="viz-mode-selector">
         <button
@@ -1329,6 +1648,8 @@ function OverviewView({ runData, metrics, selectedMetric, operation, isNewSchema
         onSort=${handleSort}
         onSelectBenchmark=${onSelectBenchmark}
         metricDef=${metricDef}
+        baselineLabel=${baselineLabel}
+        primaryLabel=${primaryLabel}
       />
     </div>
   `;
@@ -1376,7 +1697,7 @@ function App() {
 const styles = `
 /* CSS Variables for charts */
 :root {
-  --chart-serde: #6b7280;
+  --chart-baseline: #6b7280;
   --chart-facet: #3b82f6;
   --chart-compare: rgba(156, 163, 175, 0.4);
 }

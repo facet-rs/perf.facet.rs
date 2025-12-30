@@ -1,0 +1,805 @@
+{
+  "$comment": "Generated from tools/benchmark-analyzer/src/run_types.rs - do not edit manually",
+  "additionalProperties": false,
+  "description": "Top-level run.json structure (run-v1 schema)",
+  "properties": {
+    "catalog": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "description": "Catalog of benchmark metadata",
+          "properties": {
+            "benchmarks": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "description": "Benchmark definition",
+                "properties": {
+                  "format": {
+                    "type": "string"
+                  },
+                  "group": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "metrics_order": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "targets_order": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "group",
+                  "format",
+                  "targets_order",
+                  "metrics_order"
+                ],
+                "title": "BenchmarkDef",
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "formats": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "description": "Format definition (e.g., JSON, Postcard)",
+                "properties": {
+                  "baseline_target": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "primary_target": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "baseline_target",
+                  "primary_target"
+                ],
+                "title": "FormatDef",
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "formats_order": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "groups": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "description": "Group definition",
+                "properties": {
+                  "benchmarks_order": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "label",
+                  "benchmarks_order"
+                ],
+                "title": "GroupDef",
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "groups_order": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "metrics": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "description": "Metric definition",
+                "properties": {
+                  "better": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "unit",
+                  "better"
+                ],
+                "title": "MetricDef",
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "targets": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "description": "Target definition",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "kind"
+                ],
+                "title": "TargetDef",
+                "type": "object"
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "formats_order",
+            "formats",
+            "groups_order",
+            "groups",
+            "benchmarks",
+            "targets",
+            "metrics"
+          ],
+          "title": "RunCatalog",
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "defaults": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "description": "Default display settings",
+          "properties": {
+            "baseline_target": {
+              "type": "string"
+            },
+            "comparison_mode": {
+              "type": "string"
+            },
+            "metric": {
+              "type": "string"
+            },
+            "operation": {
+              "type": "string"
+            },
+            "primary_target": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "operation",
+            "metric",
+            "baseline_target",
+            "primary_target",
+            "comparison_mode"
+          ],
+          "title": "RunDefaults",
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "results": {
+      "additionalProperties": false,
+      "description": "Results section",
+      "properties": {
+        "errors": {
+          "additionalProperties": false,
+          "description": "Errors section",
+          "properties": {
+            "_parse_failures": {
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "description": "Parse failures by tool",
+                  "properties": {
+                    "divan": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "gungraun": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "divan",
+                    "gungraun"
+                  ],
+                  "title": "ParseFailures",
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "title": "RunErrors",
+          "type": "object"
+        },
+        "values": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "description": "Operations for a benchmark (deserialize/serialize)",
+            "properties": {
+              "deserialize": {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Metrics for a single target",
+                      "properties": {
+                        "estimated_cycles": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "instructions": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "l1_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ll_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ram_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier1_fallbacks": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_attempts": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_compile_unsupported": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_runtime_error": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_runtime_unsupported": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_successes": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "time_median_ns": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "total_read_write": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "title": "TargetMetrics",
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              "serialize": {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "Metrics for a single target",
+                      "properties": {
+                        "estimated_cycles": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "instructions": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "l1_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ll_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ram_hits": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier1_fallbacks": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_attempts": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_compile_unsupported": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_runtime_error": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_runtime_unsupported": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "tier2_successes": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "time_median_ns": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "total_read_write": {
+                          "anyOf": [
+                            {
+                              "maximum": "18446744073709551615",
+                              "minimum": "0",
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "title": "TargetMetrics",
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "deserialize",
+              "serialize"
+            ],
+            "title": "BenchmarkOps",
+            "type": "object"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "values",
+        "errors"
+      ],
+      "title": "RunResults",
+      "type": "object"
+    },
+    "run": {
+      "additionalProperties": false,
+      "description": "Run metadata",
+      "properties": {
+        "branch_key": {
+          "type": "string"
+        },
+        "branch_original": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commit_message": {
+          "type": "string"
+        },
+        "commit_short": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pr_number": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pr_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "sha": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "short": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timestamp": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timestamp_unix": {
+          "anyOf": [
+            {
+              "maximum": "9223372036854775807",
+              "minimum": "-9223372036854775808",
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool_versions": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "description": "Tool versions",
+              "properties": {
+                "divan": {
+                  "type": "string"
+                },
+                "gungraun": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "divan",
+                "gungraun"
+              ],
+              "title": "ToolVersions",
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "run_id",
+        "branch_key",
+        "commit_message"
+      ],
+      "title": "RunMeta",
+      "type": "object"
+    },
+    "schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "run",
+    "results"
+  ],
+  "title": "RunJson",
+  "type": "object"
+}
