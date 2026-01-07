@@ -1,0 +1,3989 @@
+{
+  "schema": "run-v1",
+  "run": {
+    "run_id": "fix-1167-vtable-soundness-audit/f07cd4f04a5379c8ba5d37705fc4fe3eaf6b4285",
+    "branch_key": "fix-1167-vtable-soundness-audit",
+    "sha": "f07cd4f04a5379c8ba5d37705fc4fe3eaf6b4285",
+    "short": "f07cd4f0",
+    "timestamp": "2026-01-07T11:05:42.870967892+00:00",
+    "timestamp_unix": 1767783942,
+    "commit_message": "fix(soundness): introduce TryFromOutcome enum for explicit ownership semantics",
+    "pr_number": "1699",
+    "pr_title": "fix(soundness): introduce TryFromOutcome enum for explicit ownership semantics",
+    "tool_versions": {
+      "divan": "present",
+      "gungraun": "present"
+    }
+  },
+  "defaults": {
+    "operation": "deserialize",
+    "metric": "instructions",
+    "baseline_target": "serde_json",
+    "primary_target": "facet_json_t2",
+    "comparison_mode": "none"
+  },
+  "catalog": {
+    "formats_order": [
+      "json",
+      "postcard"
+    ],
+    "formats": {
+      "json": {
+        "key": "json",
+        "label": "JSON",
+        "baseline_target": "serde_json",
+        "primary_target": "facet_json_t2"
+      },
+      "postcard": {
+        "key": "postcard",
+        "label": "Postcard",
+        "baseline_target": "postcard",
+        "primary_target": "facet_postcard_t2"
+      }
+    },
+    "groups_order": [
+      "micro",
+      "synthetic",
+      "realistic"
+    ],
+    "groups": {
+      "micro": {
+        "label": "Micro Benchmarks",
+        "benchmarks_order": [
+          "json::simple_struct",
+          "json::short_keys",
+          "json::medium_keys",
+          "json::long_keys",
+          "json::single_nested_struct",
+          "json::nest_1",
+          "json::nest_2",
+          "json::nest_3",
+          "json::simple_with_options",
+          "postcard::vec_bool_1k",
+          "postcard::vec_u8_empty",
+          "postcard::vec_u8_16",
+          "postcard::vec_u8_256",
+          "postcard::vec_u8_1k",
+          "postcard::vec_u8_64k",
+          "postcard::vec_u64_small",
+          "postcard::simple_struct",
+          "postcard::nested_struct"
+        ]
+      },
+      "synthetic": {
+        "label": "Synthetic Benchmarks",
+        "benchmarks_order": [
+          "json::booleans",
+          "json::integers",
+          "json::floats",
+          "json::short_strings",
+          "json::long_strings",
+          "json::escaped_strings",
+          "json::hashmaps",
+          "json::nested_structs",
+          "json::options",
+          "json::wide_struct_50",
+          "json::wide_struct_63",
+          "json::unknown_fields",
+          "json::deep_nesting_5levels",
+          "json::large_strings_escaped",
+          "json::large_strings_unescaped",
+          "json::big_array_10k",
+          "json::flatten_2enums",
+          "json::flatten_4enums",
+          "postcard::vec_u32_1k",
+          "postcard::vec_u64_1k",
+          "postcard::vec_u64_large",
+          "postcard::vec_i32_1k",
+          "postcard::vec_i64_1k",
+          "postcard::wide_struct",
+          "postcard::vec_simple_struct",
+          "postcard::vec_string_short",
+          "postcard::vec_string_long"
+        ]
+      },
+      "realistic": {
+        "label": "Realistic Benchmarks",
+        "benchmarks_order": [
+          "json::twitter",
+          "json::canada",
+          "json::citm_catalog"
+        ]
+      }
+    },
+    "benchmarks": {
+      "json::simple_struct": {
+        "key": "json::simple_struct",
+        "label": "simple_struct",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::short_keys": {
+        "key": "json::short_keys",
+        "label": "short_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::medium_keys": {
+        "key": "json::medium_keys",
+        "label": "medium_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::long_keys": {
+        "key": "json::long_keys",
+        "label": "long_keys",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::single_nested_struct": {
+        "key": "json::single_nested_struct",
+        "label": "single_nested_struct",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_1": {
+        "key": "json::nest_1",
+        "label": "nest_1",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_2": {
+        "key": "json::nest_2",
+        "label": "nest_2",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nest_3": {
+        "key": "json::nest_3",
+        "label": "nest_3",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::simple_with_options": {
+        "key": "json::simple_with_options",
+        "label": "simple_with_options",
+        "group": "micro",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::booleans": {
+        "key": "json::booleans",
+        "label": "booleans",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::integers": {
+        "key": "json::integers",
+        "label": "integers",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::floats": {
+        "key": "json::floats",
+        "label": "floats",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::short_strings": {
+        "key": "json::short_strings",
+        "label": "short_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::long_strings": {
+        "key": "json::long_strings",
+        "label": "long_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::escaped_strings": {
+        "key": "json::escaped_strings",
+        "label": "escaped_strings",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::hashmaps": {
+        "key": "json::hashmaps",
+        "label": "hashmaps",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::nested_structs": {
+        "key": "json::nested_structs",
+        "label": "nested_structs",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::options": {
+        "key": "json::options",
+        "label": "options",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::wide_struct_50": {
+        "key": "json::wide_struct_50",
+        "label": "wide_struct_50",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::wide_struct_63": {
+        "key": "json::wide_struct_63",
+        "label": "wide_struct_63",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::unknown_fields": {
+        "key": "json::unknown_fields",
+        "label": "unknown_fields",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::deep_nesting_5levels": {
+        "key": "json::deep_nesting_5levels",
+        "label": "deep_nesting_5levels",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::large_strings_escaped": {
+        "key": "json::large_strings_escaped",
+        "label": "large_strings_escaped",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::large_strings_unescaped": {
+        "key": "json::large_strings_unescaped",
+        "label": "large_strings_unescaped",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::big_array_10k": {
+        "key": "json::big_array_10k",
+        "label": "big_array_10k",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::flatten_2enums": {
+        "key": "json::flatten_2enums",
+        "label": "flatten_2enums",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::flatten_4enums": {
+        "key": "json::flatten_4enums",
+        "label": "flatten_4enums",
+        "group": "synthetic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::twitter": {
+        "key": "json::twitter",
+        "label": "twitter",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::canada": {
+        "key": "json::canada",
+        "label": "canada",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "json::citm_catalog": {
+        "key": "json::citm_catalog",
+        "label": "citm_catalog",
+        "group": "realistic",
+        "format": "json",
+        "targets_order": [
+          "serde_json",
+          "facet_json_t2",
+          "facet_json_t1",
+          "facet_json_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_bool_1k": {
+        "key": "postcard::vec_bool_1k",
+        "label": "vec_bool_1k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_empty": {
+        "key": "postcard::vec_u8_empty",
+        "label": "vec_u8_empty",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_16": {
+        "key": "postcard::vec_u8_16",
+        "label": "vec_u8_16",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_256": {
+        "key": "postcard::vec_u8_256",
+        "label": "vec_u8_256",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_1k": {
+        "key": "postcard::vec_u8_1k",
+        "label": "vec_u8_1k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u8_64k": {
+        "key": "postcard::vec_u8_64k",
+        "label": "vec_u8_64k",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_small": {
+        "key": "postcard::vec_u64_small",
+        "label": "vec_u64_small",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::simple_struct": {
+        "key": "postcard::simple_struct",
+        "label": "simple_struct",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::nested_struct": {
+        "key": "postcard::nested_struct",
+        "label": "nested_struct",
+        "group": "micro",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u32_1k": {
+        "key": "postcard::vec_u32_1k",
+        "label": "vec_u32_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_1k": {
+        "key": "postcard::vec_u64_1k",
+        "label": "vec_u64_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_u64_large": {
+        "key": "postcard::vec_u64_large",
+        "label": "vec_u64_large",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_i32_1k": {
+        "key": "postcard::vec_i32_1k",
+        "label": "vec_i32_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_i64_1k": {
+        "key": "postcard::vec_i64_1k",
+        "label": "vec_i64_1k",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::wide_struct": {
+        "key": "postcard::wide_struct",
+        "label": "wide_struct",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_simple_struct": {
+        "key": "postcard::vec_simple_struct",
+        "label": "vec_simple_struct",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_string_short": {
+        "key": "postcard::vec_string_short",
+        "label": "vec_string_short",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      },
+      "postcard::vec_string_long": {
+        "key": "postcard::vec_string_long",
+        "label": "vec_string_long",
+        "group": "synthetic",
+        "format": "postcard",
+        "targets_order": [
+          "postcard",
+          "facet_postcard_t2",
+          "facet_postcard_t0"
+        ],
+        "metrics_order": [
+          "instructions",
+          "estimated_cycles",
+          "time_median_ns",
+          "l1_hits",
+          "ll_hits",
+          "ram_hits",
+          "total_read_write"
+        ]
+      }
+    },
+    "targets": {
+      "serde_json": {
+        "key": "serde_json",
+        "label": "serde_json",
+        "kind": "baseline"
+      },
+      "facet_json_t2": {
+        "key": "facet_json_t2",
+        "label": "facet+jit2",
+        "kind": "facet"
+      },
+      "facet_json_t1": {
+        "key": "facet_json_t1",
+        "label": "facet+jit1",
+        "kind": "facet"
+      },
+      "facet_json_t0": {
+        "key": "facet_json_t0",
+        "label": "facet",
+        "kind": "facet"
+      },
+      "postcard": {
+        "key": "postcard",
+        "label": "postcard",
+        "kind": "baseline"
+      },
+      "facet_postcard_t2": {
+        "key": "facet_postcard_t2",
+        "label": "facet+jit2",
+        "kind": "facet"
+      },
+      "facet_postcard_t0": {
+        "key": "facet_postcard_t0",
+        "label": "facet",
+        "kind": "facet"
+      }
+    },
+    "metrics": {
+      "instructions": {
+        "key": "instructions",
+        "label": "Instructions",
+        "unit": "count",
+        "better": "lower"
+      },
+      "estimated_cycles": {
+        "key": "estimated_cycles",
+        "label": "Est. Cycles",
+        "unit": "count",
+        "better": "lower"
+      },
+      "time_median_ns": {
+        "key": "time_median_ns",
+        "label": "Median Time",
+        "unit": "ns",
+        "better": "lower"
+      },
+      "l1_hits": {
+        "key": "l1_hits",
+        "label": "L1 Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "ll_hits": {
+        "key": "ll_hits",
+        "label": "LL Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "ram_hits": {
+        "key": "ram_hits",
+        "label": "RAM Hits",
+        "unit": "count",
+        "better": "lower"
+      },
+      "total_read_write": {
+        "key": "total_read_write",
+        "label": "Total R/W",
+        "unit": "count",
+        "better": "lower"
+      }
+    }
+  },
+  "results": {
+    "values": {
+      "json::simple_struct": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1520,
+            "estimated_cycles": 4607,
+            "time_median_ns": 76.64,
+            "l1_hits": 2002,
+            "ll_hits": 3,
+            "ram_hits": 74,
+            "total_read_write": 2079
+          },
+          "facet_json_t2": {
+            "instructions": 1141,
+            "estimated_cycles": 3185,
+            "time_median_ns": 89.77,
+            "l1_hits": 1575,
+            "ll_hits": 7,
+            "ram_hits": 45,
+            "total_read_write": 1627
+          },
+          "facet_json_t1": {
+            "instructions": 6905,
+            "estimated_cycles": 12404,
+            "time_median_ns": 539.7,
+            "l1_hits": 10449,
+            "ll_hits": 34,
+            "ram_hits": 51,
+            "total_read_write": 10534
+          },
+          "facet_json_t0": {
+            "instructions": 13655,
+            "estimated_cycles": 42587,
+            "time_median_ns": 1069,
+            "l1_hits": 20517,
+            "ll_hits": 81,
+            "ram_hits": 619,
+            "total_read_write": 21217
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 2466,
+            "estimated_cycles": 7141,
+            "time_median_ns": 39.61,
+            "l1_hits": 3341,
+            "ll_hits": 11,
+            "ram_hits": 107,
+            "total_read_write": 3459
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 7194,
+            "estimated_cycles": 20798,
+            "time_median_ns": 379.7,
+            "l1_hits": 10213,
+            "ll_hits": 73,
+            "ram_hits": 292,
+            "total_read_write": 10578
+          }
+        }
+      },
+      "json::short_keys": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1883,
+            "estimated_cycles": 5378,
+            "time_median_ns": 91.96,
+            "l1_hits": 2493,
+            "ll_hits": 3,
+            "ram_hits": 82,
+            "total_read_write": 2578
+          },
+          "facet_json_t2": {
+            "instructions": 1407,
+            "estimated_cycles": 3385,
+            "time_median_ns": 89.77,
+            "l1_hits": 1915,
+            "ll_hits": 7,
+            "ram_hits": 41,
+            "total_read_write": 1963
+          },
+          "facet_json_t1": {
+            "instructions": 8541,
+            "estimated_cycles": 14992,
+            "time_median_ns": 659.7,
+            "l1_hits": 12962,
+            "ll_hits": 35,
+            "ram_hits": 53,
+            "total_read_write": 13050
+          },
+          "facet_json_t0": {
+            "instructions": 17340,
+            "estimated_cycles": 49494,
+            "time_median_ns": 1389,
+            "l1_hits": 26229,
+            "ll_hits": 89,
+            "ram_hits": 652,
+            "total_read_write": 26970
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3019,
+            "estimated_cycles": 8595,
+            "time_median_ns": 48.83,
+            "l1_hits": 4095,
+            "ll_hits": 11,
+            "ram_hits": 127,
+            "total_read_write": 4233
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 8248,
+            "estimated_cycles": 23118,
+            "time_median_ns": 339.7,
+            "l1_hits": 11808,
+            "ll_hits": 71,
+            "ram_hits": 313,
+            "total_read_write": 12192
+          }
+        }
+      },
+      "json::medium_keys": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 2033,
+            "estimated_cycles": 5655,
+            "time_median_ns": 95.71,
+            "l1_hits": 2665,
+            "ll_hits": 3,
+            "ram_hits": 85,
+            "total_read_write": 2753
+          },
+          "facet_json_t2": {
+            "instructions": 1402,
+            "estimated_cycles": 3419,
+            "time_median_ns": 89.77,
+            "l1_hits": 1884,
+            "ll_hits": 6,
+            "ram_hits": 43,
+            "total_read_write": 1933
+          },
+          "facet_json_t1": {
+            "instructions": 9598,
+            "estimated_cycles": 16333,
+            "time_median_ns": 719.7,
+            "l1_hits": 14433,
+            "ll_hits": 37,
+            "ram_hits": 49,
+            "total_read_write": 14519
+          },
+          "facet_json_t0": {
+            "instructions": 18396,
+            "estimated_cycles": 51038,
+            "time_median_ns": 1444,
+            "l1_hits": 27693,
+            "ll_hits": 91,
+            "ram_hits": 654,
+            "total_read_write": 28438
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3324,
+            "estimated_cycles": 9170,
+            "time_median_ns": 53.52,
+            "l1_hits": 4455,
+            "ll_hits": 12,
+            "ram_hits": 133,
+            "total_read_write": 4600
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 9161,
+            "estimated_cycles": 24470,
+            "time_median_ns": 379.7,
+            "l1_hits": 13055,
+            "ll_hits": 71,
+            "ram_hits": 316,
+            "total_read_write": 13442
+          }
+        }
+      },
+      "json::long_keys": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1809,
+            "estimated_cycles": 5082,
+            "time_median_ns": 81.96,
+            "l1_hits": 2332,
+            "ll_hits": 4,
+            "ram_hits": 78,
+            "total_read_write": 2414
+          },
+          "facet_json_t2": {
+            "instructions": 1709,
+            "estimated_cycles": 4023,
+            "time_median_ns": 109.7,
+            "l1_hits": 2378,
+            "ll_hits": 7,
+            "ram_hits": 46,
+            "total_read_write": 2431
+          },
+          "facet_json_t1": {
+            "instructions": 8780,
+            "estimated_cycles": 14929,
+            "time_median_ns": 619.7,
+            "l1_hits": 13054,
+            "ll_hits": 32,
+            "ram_hits": 49,
+            "total_read_write": 13135
+          },
+          "facet_json_t0": {
+            "instructions": 15521,
+            "estimated_cycles": 45057,
+            "time_median_ns": 1159,
+            "l1_hits": 23107,
+            "ll_hits": 85,
+            "ram_hits": 615,
+            "total_read_write": 23807
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3058,
+            "estimated_cycles": 8163,
+            "time_median_ns": 52.58,
+            "l1_hits": 4038,
+            "ll_hits": 13,
+            "ram_hits": 116,
+            "total_read_write": 4167
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 8006,
+            "estimated_cycles": 22162,
+            "time_median_ns": 349.7,
+            "l1_hits": 11232,
+            "ll_hits": 72,
+            "ram_hits": 302,
+            "total_read_write": 11606
+          }
+        }
+      },
+      "json::single_nested_struct": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 2340,
+            "estimated_cycles": 6309,
+            "time_median_ns": 111.9,
+            "l1_hits": 3104,
+            "ll_hits": 4,
+            "ram_hits": 91,
+            "total_read_write": 3199
+          },
+          "facet_json_t2": {
+            "instructions": 1682,
+            "estimated_cycles": 3793,
+            "time_median_ns": 99.77,
+            "l1_hits": 2248,
+            "ll_hits": 8,
+            "ram_hits": 43,
+            "total_read_write": 2299
+          },
+          "facet_json_t1": {
+            "instructions": 9992,
+            "estimated_cycles": 17184,
+            "time_median_ns": 769.7,
+            "l1_hits": 15204,
+            "ll_hits": 39,
+            "ram_hits": 51,
+            "total_read_write": 15294
+          },
+          "facet_json_t0": {
+            "instructions": 20524,
+            "estimated_cycles": 56554,
+            "time_median_ns": 1589,
+            "l1_hits": 31039,
+            "ll_hits": 147,
+            "ram_hits": 708,
+            "total_read_write": 31894
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3619,
+            "estimated_cycles": 9747,
+            "time_median_ns": 57.27,
+            "l1_hits": 4912,
+            "ll_hits": 15,
+            "ram_hits": 136,
+            "total_read_write": 5063
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 10519,
+            "estimated_cycles": 26822,
+            "time_median_ns": 429.7,
+            "l1_hits": 15122,
+            "ll_hits": 93,
+            "ram_hits": 321,
+            "total_read_write": 15536
+          }
+        }
+      },
+      "json::nest_1": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1087,
+            "estimated_cycles": 3742,
+            "time_median_ns": 54.3,
+            "l1_hits": 1452,
+            "ll_hits": 3,
+            "ram_hits": 65,
+            "total_read_write": 1520
+          },
+          "facet_json_t2": {
+            "instructions": 976,
+            "estimated_cycles": 2983,
+            "time_median_ns": 79.77,
+            "l1_hits": 1378,
+            "ll_hits": 6,
+            "ram_hits": 45,
+            "total_read_write": 1429
+          },
+          "facet_json_t1": {
+            "instructions": 4627,
+            "estimated_cycles": 8817,
+            "time_median_ns": 369.7,
+            "l1_hits": 7042,
+            "ll_hits": 26,
+            "ram_hits": 47,
+            "total_read_write": 7115
+          },
+          "facet_json_t0": {
+            "instructions": 9674,
+            "estimated_cycles": 34646,
+            "time_median_ns": 794.7,
+            "l1_hits": 14416,
+            "ll_hits": 63,
+            "ram_hits": 569,
+            "total_read_write": 15048
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 1812,
+            "estimated_cycles": 5914,
+            "time_median_ns": 29.3,
+            "l1_hits": 2469,
+            "ll_hits": 10,
+            "ram_hits": 97,
+            "total_read_write": 2576
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 5327,
+            "estimated_cycles": 17067,
+            "time_median_ns": 219.7,
+            "l1_hits": 7547,
+            "ll_hits": 70,
+            "ram_hits": 262,
+            "total_read_write": 7879
+          }
+        }
+      },
+      "json::nest_2": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1867,
+            "estimated_cycles": 5423,
+            "time_median_ns": 92.27,
+            "l1_hits": 2498,
+            "ll_hits": 4,
+            "ram_hits": 83,
+            "total_read_write": 2585
+          },
+          "facet_json_t2": {
+            "instructions": 1321,
+            "estimated_cycles": 3454,
+            "time_median_ns": 89.77,
+            "l1_hits": 1809,
+            "ll_hits": 7,
+            "ram_hits": 46,
+            "total_read_write": 1862
+          },
+          "facet_json_t1": {
+            "instructions": 8131,
+            "estimated_cycles": 14428,
+            "time_median_ns": 629.7,
+            "l1_hits": 12393,
+            "ll_hits": 36,
+            "ram_hits": 53,
+            "total_read_write": 12482
+          },
+          "facet_json_t0": {
+            "instructions": 16613,
+            "estimated_cycles": 49340,
+            "time_median_ns": 1329,
+            "l1_hits": 25055,
+            "ll_hits": 111,
+            "ram_hits": 678,
+            "total_read_write": 25844
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 2943,
+            "estimated_cycles": 8332,
+            "time_median_ns": 46.02,
+            "l1_hits": 4027,
+            "ll_hits": 14,
+            "ram_hits": 121,
+            "total_read_write": 4162
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 9065,
+            "estimated_cycles": 23729,
+            "time_median_ns": 349.7,
+            "l1_hits": 13039,
+            "ll_hits": 94,
+            "ram_hits": 292,
+            "total_read_write": 13425
+          }
+        }
+      },
+      "json::nest_3": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 2656,
+            "estimated_cycles": 7209,
+            "time_median_ns": 114.4,
+            "l1_hits": 3554,
+            "ll_hits": 10,
+            "ram_hits": 103,
+            "total_read_write": 3667
+          },
+          "facet_json_t2": {
+            "instructions": 1656,
+            "estimated_cycles": 3829,
+            "time_median_ns": 109.7,
+            "l1_hits": 2224,
+            "ll_hits": 6,
+            "ram_hits": 45,
+            "total_read_write": 2275
+          },
+          "facet_json_t1": {
+            "instructions": 11630,
+            "estimated_cycles": 19792,
+            "time_median_ns": 919.7,
+            "l1_hits": 17747,
+            "ll_hits": 45,
+            "ram_hits": 52,
+            "total_read_write": 17844
+          },
+          "facet_json_t0": {
+            "instructions": 23712,
+            "estimated_cycles": 64891,
+            "time_median_ns": 1839,
+            "l1_hits": 35871,
+            "ll_hits": 162,
+            "ram_hits": 806,
+            "total_read_write": 36839
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 4079,
+            "estimated_cycles": 10909,
+            "time_median_ns": 66.64,
+            "l1_hits": 5589,
+            "ll_hits": 21,
+            "ram_hits": 149,
+            "total_read_write": 5759
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 12347,
+            "estimated_cycles": 30028,
+            "time_median_ns": 499.7,
+            "l1_hits": 17913,
+            "ll_hits": 113,
+            "ram_hits": 330,
+            "total_read_write": 18356
+          }
+        }
+      },
+      "json::simple_with_options": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 2004,
+            "estimated_cycles": 5831,
+            "time_median_ns": 87.58,
+            "l1_hits": 2586,
+            "ll_hits": 5,
+            "ram_hits": 92,
+            "total_read_write": 2683
+          },
+          "facet_json_t2": {
+            "instructions": 1614,
+            "estimated_cycles": 3813,
+            "time_median_ns": 99.77,
+            "l1_hits": 2168,
+            "ll_hits": 7,
+            "ram_hits": 46,
+            "total_read_write": 2221
+          },
+          "facet_json_t1": {
+            "instructions": 10129,
+            "estimated_cycles": 17350,
+            "time_median_ns": 779.7,
+            "l1_hits": 15240,
+            "ll_hits": 44,
+            "ram_hits": 54,
+            "total_read_write": 15338
+          },
+          "facet_json_t0": {
+            "instructions": 21412,
+            "estimated_cycles": 61036,
+            "time_median_ns": 1849,
+            "l1_hits": 32301,
+            "ll_hits": 154,
+            "ram_hits": 799,
+            "total_read_write": 33254
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3464,
+            "estimated_cycles": 10192,
+            "time_median_ns": 68.21,
+            "l1_hits": 4532,
+            "ll_hits": 12,
+            "ram_hits": 160,
+            "total_read_write": 4704
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 9487,
+            "estimated_cycles": 26169,
+            "time_median_ns": 439.7,
+            "l1_hits": 13404,
+            "ll_hits": 96,
+            "ram_hits": 351,
+            "total_read_write": 13851
+          }
+        }
+      },
+      "json::booleans": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1157980,
+            "estimated_cycles": 1635119,
+            "time_median_ns": 36190,
+            "l1_hits": 1598064,
+            "ll_hits": 12,
+            "ram_hits": 1057,
+            "total_read_write": 1599133
+          },
+          "facet_json_t2": {
+            "instructions": 896565,
+            "estimated_cycles": 1113746,
+            "time_median_ns": 25210,
+            "l1_hits": 1104961,
+            "ll_hits": 1456,
+            "ram_hits": 43,
+            "total_read_write": 1106460
+          },
+          "facet_json_t1": {
+            "instructions": 7381970,
+            "estimated_cycles": 11664457,
+            "time_median_ns": 578100,
+            "l1_hits": 11655557,
+            "ll_hits": 1479,
+            "ram_hits": 43,
+            "total_read_write": 11657079
+          },
+          "facet_json_t0": {
+            "instructions": 25960194,
+            "estimated_cycles": 42198142,
+            "time_median_ns": 2475000,
+            "l1_hits": 41970902,
+            "ll_hits": 35249,
+            "ram_hits": 1457,
+            "total_read_write": 42007608
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 1345653,
+            "estimated_cycles": 1929553,
+            "time_median_ns": 7509,
+            "l1_hits": 1860593,
+            "ll_hits": 191,
+            "ram_hits": 1943,
+            "total_read_write": 1862727
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 4696537,
+            "estimated_cycles": 7000132,
+            "time_median_ns": 243100,
+            "l1_hits": 6923132,
+            "ll_hits": 1120,
+            "ram_hits": 2040,
+            "total_read_write": 6926292
+          }
+        }
+      },
+      "json::integers": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 389714,
+            "estimated_cycles": 495798,
+            "time_median_ns": 13190,
+            "l1_hits": 480358,
+            "ll_hits": 8,
+            "ram_hits": 440,
+            "total_read_write": 480806
+          },
+          "facet_json_t2": {
+            "instructions": 331134,
+            "estimated_cycles": 379290,
+            "time_median_ns": 13630,
+            "l1_hits": 375270,
+            "ll_hits": 517,
+            "ram_hits": 41,
+            "total_read_write": 375828
+          },
+          "facet_json_t1": {
+            "instructions": 1366772,
+            "estimated_cycles": 2036947,
+            "time_median_ns": 93470,
+            "l1_hits": 2032842,
+            "ll_hits": 513,
+            "ram_hits": 44,
+            "total_read_write": 2033399
+          },
+          "facet_json_t0": {
+            "instructions": 3362966,
+            "estimated_cycles": 5318709,
+            "time_median_ns": 297700,
+            "l1_hits": 5287514,
+            "ll_hits": 163,
+            "ram_hits": 868,
+            "total_read_write": 5288545
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 506575,
+            "estimated_cycles": 639130,
+            "time_median_ns": 7299,
+            "l1_hits": 612900,
+            "ll_hits": 24,
+            "ram_hits": 746,
+            "total_read_write": 613670
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 819632,
+            "estimated_cycles": 1121684,
+            "time_median_ns": 33720,
+            "l1_hits": 1091619,
+            "ll_hits": 105,
+            "ram_hits": 844,
+            "total_read_write": 1092568
+          }
+        }
+      },
+      "json::floats": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 424591,
+            "estimated_cycles": 544889,
+            "time_median_ns": 16270,
+            "l1_hits": 529469,
+            "ll_hits": 11,
+            "ram_hits": 439,
+            "total_read_write": 529919
+          },
+          "facet_json_t2": {
+            "instructions": 380285,
+            "estimated_cycles": 462520,
+            "time_median_ns": 13930,
+            "l1_hits": 459380,
+            "ll_hits": 341,
+            "ram_hits": 41,
+            "total_read_write": 459762
+          },
+          "facet_json_t1": {
+            "instructions": 1409788,
+            "estimated_cycles": 2067989,
+            "time_median_ns": 93990,
+            "l1_hits": 2063934,
+            "ll_hits": 496,
+            "ram_hits": 45,
+            "total_read_write": 2064475
+          },
+          "facet_json_t0": {
+            "instructions": 3391970,
+            "estimated_cycles": 5406969,
+            "time_median_ns": 303300,
+            "l1_hits": 5285559,
+            "ll_hits": 18178,
+            "ram_hits": 872,
+            "total_read_write": 5304609
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 682170,
+            "estimated_cycles": 859954,
+            "time_median_ns": 16960,
+            "l1_hits": 834464,
+            "ll_hits": 23,
+            "ram_hits": 725,
+            "total_read_write": 835212
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 1001652,
+            "estimated_cycles": 1348587,
+            "time_median_ns": 48050,
+            "l1_hits": 1319457,
+            "ll_hits": 93,
+            "ram_hits": 819,
+            "total_read_write": 1320369
+          }
+        }
+      },
+      "json::short_strings": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 589611,
+            "estimated_cycles": 843658,
+            "time_median_ns": 27260,
+            "l1_hits": 801728,
+            "ll_hits": 63,
+            "ram_hits": 1189,
+            "total_read_write": 802980
+          },
+          "facet_json_t2": {
+            "instructions": 638569,
+            "estimated_cycles": 884738,
+            "time_median_ns": 27850,
+            "l1_hits": 873258,
+            "ll_hits": 1918,
+            "ram_hits": 54,
+            "total_read_write": 875230
+          },
+          "facet_json_t1": {
+            "instructions": 1680520,
+            "estimated_cycles": 2460544,
+            "time_median_ns": 113500,
+            "l1_hits": 2451624,
+            "ll_hits": 1483,
+            "ram_hits": 43,
+            "total_read_write": 2453150
+          },
+          "facet_json_t0": {
+            "instructions": 3409167,
+            "estimated_cycles": 5453872,
+            "time_median_ns": 284700,
+            "l1_hits": 5293202,
+            "ll_hits": 21060,
+            "ram_hits": 1582,
+            "total_read_write": 5315844
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 759791,
+            "estimated_cycles": 1091134,
+            "time_median_ns": 7059,
+            "l1_hits": 1036534,
+            "ll_hits": 959,
+            "ram_hits": 1423,
+            "total_read_write": 1038916
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 1437374,
+            "estimated_cycles": 2118283,
+            "time_median_ns": 40970,
+            "l1_hits": 2059363,
+            "ll_hits": 1158,
+            "ram_hits": 1518,
+            "total_read_write": 2062039
+          }
+        }
+      },
+      "json::long_strings": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 362957,
+            "estimated_cycles": 526833,
+            "time_median_ns": 16250,
+            "l1_hits": 410158,
+            "ll_hits": 67,
+            "ram_hits": 3324,
+            "total_read_write": 413549
+          },
+          "facet_json_t2": {
+            "instructions": 385666,
+            "estimated_cycles": 457063,
+            "time_median_ns": 15980,
+            "l1_hits": 438543,
+            "ll_hits": 3417,
+            "ram_hits": 41,
+            "total_read_write": 442001
+          },
+          "facet_json_t1": {
+            "instructions": 4790211,
+            "estimated_cycles": 6893728,
+            "time_median_ns": 196400,
+            "l1_hits": 6875148,
+            "ll_hits": 3401,
+            "ram_hits": 45,
+            "total_read_write": 6878594
+          },
+          "facet_json_t0": {
+            "instructions": 4909895,
+            "estimated_cycles": 7232215,
+            "time_median_ns": 215000,
+            "l1_hits": 7091735,
+            "ll_hits": 2056,
+            "ram_hits": 3720,
+            "total_read_write": 7097511
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 1288088,
+            "estimated_cycles": 1725034,
+            "time_median_ns": 46470,
+            "l1_hits": 1544724,
+            "ll_hits": 1783,
+            "ram_hits": 4897,
+            "total_read_write": 1551404
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 922233,
+            "estimated_cycles": 1277015,
+            "time_median_ns": 20830,
+            "l1_hits": 1083520,
+            "ll_hits": 3426,
+            "ram_hits": 5039,
+            "total_read_write": 1091985
+          }
+        }
+      },
+      "json::escaped_strings": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1504080,
+            "estimated_cycles": 2125637,
+            "time_median_ns": 59280,
+            "l1_hits": 2039252,
+            "ll_hits": 218,
+            "ram_hits": 2437,
+            "total_read_write": 2041907
+          },
+          "facet_json_t2": {
+            "instructions": 1427438,
+            "estimated_cycles": 1886576,
+            "time_median_ns": 56830,
+            "l1_hits": 1867071,
+            "ll_hits": 3551,
+            "ram_hits": 50,
+            "total_read_write": 1870672
+          },
+          "facet_json_t1": {
+            "instructions": 4347507,
+            "estimated_cycles": 6299924,
+            "time_median_ns": 203400,
+            "l1_hits": 6284599,
+            "ll_hits": 2610,
+            "ram_hits": 65,
+            "total_read_write": 6287274
+          },
+          "facet_json_t0": {
+            "instructions": 6553635,
+            "estimated_cycles": 9966482,
+            "time_median_ns": 406000,
+            "l1_hits": 9780557,
+            "ll_hits": 17431,
+            "ram_hits": 2822,
+            "total_read_write": 9800810
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 2346587,
+            "estimated_cycles": 3271533,
+            "time_median_ns": 34430,
+            "l1_hits": 3144248,
+            "ll_hits": 1664,
+            "ram_hits": 3399,
+            "total_read_write": 3149311
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 4296897,
+            "estimated_cycles": 6060726,
+            "time_median_ns": 133400,
+            "l1_hits": 5924971,
+            "ll_hits": 2651,
+            "ram_hits": 3500,
+            "total_read_write": 5931122
+          }
+        }
+      },
+      "json::hashmaps": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1403032,
+            "estimated_cycles": 1907669,
+            "time_median_ns": 71310,
+            "l1_hits": 1814879,
+            "ll_hits": 2451,
+            "ram_hits": 2301,
+            "total_read_write": 1819631
+          },
+          "facet_json_t2": {
+            "instructions": 900067,
+            "estimated_cycles": 1260263,
+            "time_median_ns": 40570,
+            "l1_hits": 1238323,
+            "ll_hits": 3821,
+            "ram_hits": 81,
+            "total_read_write": 1242225
+          },
+          "facet_json_t1": {
+            "instructions": 5917841,
+            "estimated_cycles": 9238260,
+            "time_median_ns": 509300,
+            "l1_hits": 9075665,
+            "ll_hits": 26870,
+            "ram_hits": 807,
+            "total_read_write": 9103342
+          },
+          "facet_json_t0": {
+            "instructions": 5919167,
+            "estimated_cycles": 9370092,
+            "time_median_ns": 511000,
+            "l1_hits": 9058362,
+            "ll_hits": 43712,
+            "ram_hits": 2662,
+            "total_read_write": 9104736
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 1609524,
+            "estimated_cycles": 2195916,
+            "time_median_ns": 11030,
+            "l1_hits": 2093301,
+            "ll_hits": 4248,
+            "ram_hits": 2325,
+            "total_read_write": 2099874
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 2207071,
+            "estimated_cycles": 3121125,
+            "time_median_ns": 53200,
+            "l1_hits": 3013620,
+            "ll_hits": 4575,
+            "ram_hits": 2418,
+            "total_read_write": 3020613
+          }
+        }
+      },
+      "json::nested_structs": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1663658,
+            "estimated_cycles": 2297103,
+            "time_median_ns": 91330,
+            "l1_hits": 2243958,
+            "ll_hits": 52,
+            "ram_hits": 1511,
+            "total_read_write": 2245521
+          },
+          "facet_json_t2": {
+            "instructions": 881592,
+            "estimated_cycles": 1154095,
+            "time_median_ns": 34440,
+            "l1_hits": 1141310,
+            "ll_hits": 2249,
+            "ram_hits": 44,
+            "total_read_write": 1143603
+          },
+          "facet_json_t1": {
+            "instructions": 14105505,
+            "estimated_cycles": 23112031,
+            "time_median_ns": 1227000,
+            "l1_hits": 21690221,
+            "ll_hits": 277649,
+            "ram_hits": 959,
+            "total_read_write": 21968829
+          },
+          "facet_json_t0": {
+            "instructions": 14020083,
+            "estimated_cycles": 23024985,
+            "time_median_ns": 1175000,
+            "l1_hits": 21548855,
+            "ll_hits": 278055,
+            "ram_hits": 2453,
+            "total_read_write": 21829363
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 2472324,
+            "estimated_cycles": 3492724,
+            "time_median_ns": 42300,
+            "l1_hits": 3408959,
+            "ll_hits": 716,
+            "ram_hits": 2291,
+            "total_read_write": 3411966
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 6232417,
+            "estimated_cycles": 9391153,
+            "time_median_ns": 257600.00000000003,
+            "l1_hits": 9293993,
+            "ll_hits": 1771,
+            "ram_hits": 2523,
+            "total_read_write": 9298287
+          }
+        }
+      },
+      "json::options": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 646728,
+            "estimated_cycles": 926258,
+            "time_median_ns": 33940,
+            "l1_hits": 886823,
+            "ll_hits": 89,
+            "ram_hits": 1114,
+            "total_read_write": 888026
+          },
+          "facet_json_t2": {
+            "instructions": 548615,
+            "estimated_cycles": 758899,
+            "time_median_ns": 21360,
+            "l1_hits": 750114,
+            "ll_hits": 1449,
+            "ram_hits": 44,
+            "total_read_write": 751607
+          },
+          "facet_json_t1": {
+            "instructions": 6417831,
+            "estimated_cycles": 10725191,
+            "time_median_ns": 579800,
+            "l1_hits": 9820736,
+            "ll_hits": 176670,
+            "ram_hits": 603,
+            "total_read_write": 9998009
+          },
+          "facet_json_t0": {
+            "instructions": 6379495,
+            "estimated_cycles": 10733774,
+            "time_median_ns": 564700,
+            "l1_hits": 9764584,
+            "ll_hits": 180895,
+            "ram_hits": 1849,
+            "total_read_write": 9947328
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 1119337,
+            "estimated_cycles": 1621033,
+            "time_median_ns": 21180,
+            "l1_hits": 1557818,
+            "ll_hits": 750,
+            "ram_hits": 1699,
+            "total_read_write": 1560267
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 3206880,
+            "estimated_cycles": 4839515,
+            "time_median_ns": 147500,
+            "l1_hits": 4766490,
+            "ll_hits": 1340,
+            "ram_hits": 1895,
+            "total_read_write": 4769725
+          }
+        }
+      },
+      "json::wide_struct_50": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 31381,
+            "estimated_cycles": 54344,
+            "time_median_ns": 1349,
+            "l1_hits": 41874,
+            "ll_hits": 51,
+            "ram_hits": 349,
+            "total_read_write": 42274
+          },
+          "facet_json_t2": {
+            "instructions": 18087,
+            "estimated_cycles": 26481,
+            "time_median_ns": 859.7,
+            "l1_hits": 23761,
+            "ll_hits": 229,
+            "ram_hits": 45,
+            "total_read_write": 24035
+          },
+          "facet_json_t1": {
+            "instructions": 188135,
+            "estimated_cycles": 275010,
+            "time_median_ns": 10820,
+            "l1_hits": 271845,
+            "ll_hits": 108,
+            "ram_hits": 75,
+            "total_read_write": 272028
+          },
+          "facet_json_t0": {
+            "instructions": 334320,
+            "estimated_cycles": 526592,
+            "time_median_ns": 23540,
+            "l1_hits": 495942,
+            "ll_hits": 411,
+            "ram_hits": 817,
+            "total_read_write": 497170
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 46667,
+            "estimated_cycles": 81358,
+            "time_median_ns": 769.7,
+            "l1_hits": 62883,
+            "ll_hits": 83,
+            "ram_hits": 516,
+            "total_read_write": 63482
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 96361,
+            "estimated_cycles": 171601,
+            "time_median_ns": 4089.0000000000005,
+            "l1_hits": 139366,
+            "ll_hits": 182,
+            "ram_hits": 895,
+            "total_read_write": 140443
+          }
+        }
+      },
+      "json::wide_struct_63": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 39607,
+            "estimated_cycles": 70823,
+            "time_median_ns": 1830,
+            "l1_hits": 53603,
+            "ll_hits": 77,
+            "ram_hits": 481,
+            "total_read_write": 54161
+          },
+          "facet_json_t2": {
+            "instructions": 23616,
+            "estimated_cycles": 35448,
+            "time_median_ns": 1149,
+            "l1_hits": 30993,
+            "ll_hits": 569,
+            "ram_hits": 46,
+            "total_read_write": 31608
+          },
+          "facet_json_t1": {
+            "instructions": 233468,
+            "estimated_cycles": 341105,
+            "time_median_ns": 13210,
+            "l1_hits": 336365,
+            "ll_hits": 353,
+            "ram_hits": 85,
+            "total_read_write": 336803
+          },
+          "facet_json_t0": {
+            "instructions": 436483,
+            "estimated_cycles": 684869,
+            "time_median_ns": 30160,
+            "l1_hits": 643919,
+            "ll_hits": 959,
+            "ram_hits": 1033,
+            "total_read_write": 645911
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 59805,
+            "estimated_cycles": 105313,
+            "time_median_ns": 1109,
+            "l1_hits": 81353,
+            "ll_hits": 109,
+            "ram_hits": 669,
+            "total_read_write": 82131
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 123680,
+            "estimated_cycles": 218957,
+            "time_median_ns": 5299,
+            "l1_hits": 179707,
+            "ll_hits": 311,
+            "ram_hits": 1077,
+            "total_read_write": 181095
+          }
+        }
+      },
+      "json::unknown_fields": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 2481982,
+            "estimated_cycles": 3324644,
+            "time_median_ns": 122600,
+            "l1_hits": 3241044,
+            "ll_hits": 130,
+            "ram_hits": 2370,
+            "total_read_write": 3243544
+          },
+          "facet_json_t2": {
+            "instructions": 1683718,
+            "estimated_cycles": 2222185,
+            "time_median_ns": 74980,
+            "l1_hits": 2207875,
+            "ll_hits": 2561,
+            "ram_hits": 43,
+            "total_read_write": 2210479
+          },
+          "facet_json_t1": {
+            "instructions": 15497944,
+            "estimated_cycles": 23354448,
+            "time_median_ns": 1004000,
+            "l1_hits": 23088278,
+            "ll_hits": 49153,
+            "ram_hits": 583,
+            "total_read_write": 23138014
+          },
+          "facet_json_t0": {
+            "instructions": 15459908,
+            "estimated_cycles": 23373850,
+            "time_median_ns": 1012999.9999999999,
+            "l1_hits": 23038650,
+            "ll_hits": 45396,
+            "ram_hits": 3092,
+            "total_read_write": 23087138
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 2740678,
+            "estimated_cycles": 3705332,
+            "time_median_ns": 14560,
+            "l1_hits": 3606407,
+            "ll_hits": 969,
+            "ram_hits": 2688,
+            "total_read_write": 3610064
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 3750294,
+            "estimated_cycles": 5277374,
+            "time_median_ns": 77180,
+            "l1_hits": 5166794,
+            "ll_hits": 1886,
+            "ram_hits": 2890,
+            "total_read_write": 5171570
+          }
+        }
+      },
+      "json::deep_nesting_5levels": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 7623,
+            "estimated_cycles": 17690,
+            "time_median_ns": 349.7,
+            "l1_hits": 10085,
+            "ll_hits": 30,
+            "ram_hits": 213,
+            "total_read_write": 10328
+          },
+          "facet_json_t2": {
+            "instructions": 3908,
+            "estimated_cycles": 6949,
+            "time_median_ns": 219.7,
+            "l1_hits": 5074,
+            "ll_hits": 46,
+            "ram_hits": 47,
+            "total_read_write": 5167
+          },
+          "facet_json_t1": {
+            "instructions": 31464,
+            "estimated_cycles": 50316,
+            "time_median_ns": 2389,
+            "l1_hits": 47361,
+            "ll_hits": 115,
+            "ram_hits": 68,
+            "total_read_write": 47544
+          },
+          "facet_json_t0": {
+            "instructions": 60156,
+            "estimated_cycles": 135148,
+            "time_median_ns": 4709,
+            "l1_hits": 91098,
+            "ll_hits": 529,
+            "ram_hits": 1183,
+            "total_read_write": 92810
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 11969,
+            "estimated_cycles": 27671,
+            "time_median_ns": 216,
+            "l1_hits": 16101,
+            "ll_hits": 53,
+            "ram_hits": 323,
+            "total_read_write": 16477
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 30352,
+            "estimated_cycles": 64606,
+            "time_median_ns": 1209,
+            "l1_hits": 43896,
+            "ll_hits": 166,
+            "ram_hits": 568,
+            "total_read_write": 44630
+          }
+        }
+      },
+      "json::large_strings_escaped": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 4843283,
+            "estimated_cycles": 6935436,
+            "time_median_ns": 164900,
+            "l1_hits": 6574861,
+            "ll_hits": 309,
+            "ram_hits": 10258,
+            "total_read_write": 6585428
+          },
+          "facet_json_t2": {
+            "instructions": 3689466,
+            "estimated_cycles": 4713263,
+            "time_median_ns": 143500,
+            "l1_hits": 4649588,
+            "ll_hits": 10089,
+            "ram_hits": 378,
+            "total_read_write": 4660055
+          },
+          "facet_json_t1": {
+            "instructions": 19506106,
+            "estimated_cycles": 27528660,
+            "time_median_ns": 738500,
+            "l1_hits": 27475855,
+            "ll_hits": 10253,
+            "ram_hits": 44,
+            "total_read_write": 27486152
+          },
+          "facet_json_t0": {
+            "instructions": 19949865,
+            "estimated_cycles": 29071459,
+            "time_median_ns": 759700,
+            "l1_hits": 28535019,
+            "ll_hits": 10009,
+            "ram_hits": 13897,
+            "total_read_write": 28558925
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 9057244,
+            "estimated_cycles": 12731706,
+            "time_median_ns": 174200,
+            "l1_hits": 12120371,
+            "ll_hits": 6732,
+            "ram_hits": 16505,
+            "total_read_write": 12143608
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 19299281,
+            "estimated_cycles": 27013878,
+            "time_median_ns": 722000,
+            "l1_hits": 26372593,
+            "ll_hits": 11994,
+            "ram_hits": 16609,
+            "total_read_write": 26401196
+          }
+        }
+      },
+      "json::large_strings_unescaped": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 1049060,
+            "estimated_cycles": 1728385,
+            "time_median_ns": 37980,
+            "l1_hits": 1399525,
+            "ll_hits": 203,
+            "ram_hits": 9367,
+            "total_read_write": 1409095
+          },
+          "facet_json_t2": {
+            "instructions": 1060536,
+            "estimated_cycles": 1464189,
+            "time_median_ns": 37520,
+            "l1_hits": 1414414,
+            "ll_hits": 9661,
+            "ram_hits": 42,
+            "total_read_write": 1424117
+          },
+          "facet_json_t1": {
+            "instructions": 13909488,
+            "estimated_cycles": 20222337,
+            "time_median_ns": 560500,
+            "l1_hits": 20171942,
+            "ll_hits": 9771,
+            "ram_hits": 44,
+            "total_read_write": 20181757
+          },
+          "facet_json_t0": {
+            "instructions": 13863687,
+            "estimated_cycles": 20498789,
+            "time_median_ns": 564700,
+            "l1_hits": 20142784,
+            "ll_hits": 2860,
+            "ram_hits": 9763,
+            "total_read_write": 20155407
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 3938403,
+            "estimated_cycles": 5839531,
+            "time_median_ns": 133400,
+            "l1_hits": 5281026,
+            "ll_hits": 6148,
+            "ram_hits": 15079,
+            "total_read_write": 5302253
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 2551743,
+            "estimated_cycles": 3865512,
+            "time_median_ns": 45550,
+            "l1_hits": 3274812,
+            "ll_hits": 10935,
+            "ram_hits": 15315,
+            "total_read_write": 3301062
+          }
+        }
+      },
+      "json::big_array_10k": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 3298235,
+            "estimated_cycles": 4235459,
+            "time_median_ns": 108200,
+            "l1_hits": 4118094,
+            "ll_hits": 37,
+            "ram_hits": 3348,
+            "total_read_write": 4121479
+          },
+          "facet_json_t2": {
+            "instructions": 2490253,
+            "estimated_cycles": 3091928,
+            "time_median_ns": 77750,
+            "l1_hits": 3064248,
+            "ll_hits": 5228,
+            "ram_hits": 44,
+            "total_read_write": 3069520
+          },
+          "facet_json_t1": {
+            "instructions": 12143610,
+            "estimated_cycles": 18218443,
+            "time_median_ns": 865400,
+            "l1_hits": 18195543,
+            "ll_hits": 4258,
+            "ram_hits": 46,
+            "total_read_write": 18199847
+          },
+          "facet_json_t0": {
+            "instructions": 32351191,
+            "estimated_cycles": 51318112,
+            "time_median_ns": 2939000,
+            "l1_hits": 51141632,
+            "ll_hits": 1605,
+            "ram_hits": 4813,
+            "total_read_write": 51148050
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 4303543,
+            "estimated_cycles": 5440414,
+            "time_median_ns": 59760,
+            "l1_hits": 5243019,
+            "ll_hits": 1364,
+            "ram_hits": 5445,
+            "total_read_write": 5249828
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 7372692,
+            "estimated_cycles": 10168467,
+            "time_median_ns": 330600,
+            "l1_hits": 9957117,
+            "ll_hits": 3483,
+            "ram_hits": 5541,
+            "total_read_write": 9966141
+          }
+        }
+      },
+      "json::flatten_2enums": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 5566486,
+            "estimated_cycles": 8155826,
+            "time_median_ns": 344500,
+            "l1_hits": 7983631,
+            "ll_hits": 2379,
+            "ram_hits": 4580,
+            "total_read_write": 7990590
+          },
+          "facet_json_t2": {
+            "instructions": 1976397,
+            "estimated_cycles": 2781045,
+            "time_median_ns": 71870,
+            "l1_hits": 2740805,
+            "ll_hits": 7733,
+            "ram_hits": 45,
+            "total_read_write": 2748583
+          },
+          "facet_json_t1": {
+            "instructions": 123967160,
+            "estimated_cycles": 193360747,
+            "time_median_ns": 8263999.999999999,
+            "l1_hits": 179420992,
+            "ll_hits": 2778501,
+            "ram_hits": 1350,
+            "total_read_write": 182200843
+          },
+          "facet_json_t0": {
+            "instructions": 124574169,
+            "estimated_cycles": 194567630,
+            "time_median_ns": 8311000,
+            "l1_hits": 180275060,
+            "ll_hits": 2810599,
+            "ram_hits": 6845,
+            "total_read_write": 183092504
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 7095182,
+            "estimated_cycles": 10584390,
+            "time_median_ns": 58740,
+            "l1_hits": 10290110,
+            "ll_hits": 8743,
+            "ram_hits": 7159,
+            "total_read_write": 10306012
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 15549734,
+            "estimated_cycles": 23680240,
+            "time_median_ns": 584200,
+            "l1_hits": 23349460,
+            "ll_hits": 13712,
+            "ram_hits": 7492,
+            "total_read_write": 23370664
+          }
+        }
+      },
+      "json::flatten_4enums": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 10227389,
+            "estimated_cycles": 15162655,
+            "time_median_ns": 652100,
+            "l1_hits": 14801810,
+            "ll_hits": 16253,
+            "ram_hits": 7988,
+            "total_read_write": 14826051
+          },
+          "facet_json_t2": {
+            "instructions": 3345987,
+            "estimated_cycles": 4776020,
+            "time_median_ns": 156800,
+            "l1_hits": 4625485,
+            "ll_hits": 29785,
+            "ram_hits": 46,
+            "total_read_write": 4655316
+          },
+          "facet_json_t1": {
+            "instructions": 522832008,
+            "estimated_cycles": 777271891,
+            "time_median_ns": 30700000,
+            "l1_hits": 743389296,
+            "ll_hits": 6748085,
+            "ram_hits": 4062,
+            "total_read_write": 750141443
+          },
+          "facet_json_t0": {
+            "instructions": 530411180,
+            "estimated_cycles": 788151803,
+            "time_median_ns": 30480000,
+            "l1_hits": 753480048,
+            "ll_hits": 6841839,
+            "ram_hits": 13216,
+            "total_read_write": 760335103
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 12911990,
+            "estimated_cycles": 19318559,
+            "time_median_ns": 126100,
+            "l1_hits": 18806829,
+            "ll_hits": 19977,
+            "ram_hits": 11767,
+            "total_read_write": 18838573
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 27737838,
+            "estimated_cycles": 42152269,
+            "time_median_ns": 1087000,
+            "l1_hits": 41605309,
+            "ll_hits": 25406,
+            "ram_hits": 11998,
+            "total_read_write": 41642713
+          }
+        }
+      },
+      "json::twitter": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 11516166,
+            "estimated_cycles": 16606705,
+            "time_median_ns": 303700,
+            "l1_hits": 15485035,
+            "ll_hits": 47185,
+            "ram_hits": 25307,
+            "total_read_write": 15557527
+          },
+          "facet_json_t2": {
+            "instructions": 5450968,
+            "estimated_cycles": 7006556,
+            "time_median_ns": 241100,
+            "l1_hits": 6947636,
+            "ll_hits": 11469,
+            "ram_hits": 45,
+            "total_read_write": 6959150
+          },
+          "facet_json_t1": {
+            "instructions": 34658926,
+            "estimated_cycles": 50863982,
+            "time_median_ns": 1859000,
+            "l1_hits": 50802947,
+            "ll_hits": 11801,
+            "ram_hits": 58,
+            "total_read_write": 50814806
+          },
+          "facet_json_t0": {
+            "instructions": 41783957,
+            "estimated_cycles": 62625092,
+            "time_median_ns": 2075000.0000000002,
+            "l1_hits": 61195627,
+            "ll_hits": 103977,
+            "ram_hits": 25988,
+            "total_read_write": 61325592
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 12049593,
+            "estimated_cycles": 17371968,
+            "time_median_ns": 25890,
+            "l1_hits": 16234743,
+            "ll_hits": 49876,
+            "ram_hits": 25367,
+            "total_read_write": 16309986
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 14244435,
+            "estimated_cycles": 20334544,
+            "time_median_ns": 142400,
+            "l1_hits": 19187274,
+            "ll_hits": 50548,
+            "ram_hits": 25558,
+            "total_read_write": 19263380
+          }
+        }
+      },
+      "json::canada": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 137677402,
+            "estimated_cycles": 192281000,
+            "time_median_ns": 2947000,
+            "l1_hits": 185511530,
+            "ll_hits": 325055,
+            "ram_hits": 146977,
+            "total_read_write": 185983562
+          },
+          "facet_json_t2": {
+            "instructions": 77650152,
+            "estimated_cycles": 99619715,
+            "time_median_ns": 2746000,
+            "l1_hits": 98908235,
+            "ll_hits": 136766,
+            "ram_hits": 790,
+            "total_read_write": 99045791
+          },
+          "facet_json_t1": {
+            "instructions": 262830712,
+            "estimated_cycles": 389610663,
+            "time_median_ns": 17590000,
+            "l1_hits": 388892933,
+            "ll_hits": 139668,
+            "ram_hits": 554,
+            "total_read_write": 389033155
+          },
+          "facet_json_t0": {
+            "instructions": 605984281,
+            "estimated_cycles": 958901197,
+            "time_median_ns": 50760000,
+            "l1_hits": 936458742,
+            "ll_hits": 3453408,
+            "ram_hits": 147869,
+            "total_read_write": 940060019
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 168510116,
+            "estimated_cycles": 231201312,
+            "time_median_ns": 1966000,
+            "l1_hits": 222975052,
+            "ll_hits": 389851,
+            "ram_hits": 179343,
+            "total_read_write": 223544246
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 230558200,
+            "estimated_cycles": 326686404,
+            "time_median_ns": 7755000,
+            "l1_hits": 318284169,
+            "ll_hits": 422610,
+            "ram_hits": 179691,
+            "total_read_write": 318886470
+          }
+        }
+      },
+      "json::citm_catalog": {
+        "deserialize": {
+          "serde_json": {
+            "instructions": 32594843,
+            "estimated_cycles": 48142388,
+            "time_median_ns": 1520000,
+            "l1_hits": 45424053,
+            "ll_hits": 90088,
+            "ram_hits": 64797,
+            "total_read_write": 45578938
+          },
+          "facet_json_t2": {
+            "instructions": 28708576,
+            "estimated_cycles": 35278415,
+            "time_median_ns": 1142000,
+            "l1_hits": 34993640,
+            "ll_hits": 56640,
+            "ram_hits": 45,
+            "total_read_write": 35050325
+          },
+          "facet_json_t1": {
+            "instructions": 173026520,
+            "estimated_cycles": 277629656,
+            "time_median_ns": 13090000,
+            "l1_hits": 264018896,
+            "ll_hits": 2709132,
+            "ram_hits": 1860,
+            "total_read_write": 266729888
+          },
+          "facet_json_t0": {
+            "instructions": 175029161,
+            "estimated_cycles": 283014164,
+            "time_median_ns": 13050000,
+            "l1_hits": 268337944,
+            "ll_hits": 2475113,
+            "ram_hits": 65733,
+            "total_read_write": 270878790
+          }
+        },
+        "serialize": {
+          "serde_json": {
+            "instructions": 39361422,
+            "estimated_cycles": 58100368,
+            "time_median_ns": 298200,
+            "l1_hits": 55048508,
+            "ll_hits": 101283,
+            "ram_hits": 72727,
+            "total_read_write": 55222518
+          },
+          "facet_json_t2": null,
+          "facet_json_t1": null,
+          "facet_json_t0": {
+            "instructions": 73476172,
+            "estimated_cycles": 111446122,
+            "time_median_ns": 2310000,
+            "l1_hits": 108264512,
+            "ll_hits": 117286,
+            "ram_hits": 74148,
+            "total_read_write": 108455946
+          }
+        }
+      },
+      "postcard::vec_bool_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 33878,
+            "estimated_cycles": 50847,
+            "time_median_ns": 544.7,
+            "l1_hits": 46912,
+            "ll_hits": 17,
+            "ram_hits": 110,
+            "total_read_write": 47039
+          },
+          "facet_postcard_t2": {
+            "instructions": 26296,
+            "estimated_cycles": 32276,
+            "time_median_ns": 889.7,
+            "l1_hits": 30616,
+            "ll_hits": 3,
+            "ram_hits": 47,
+            "total_read_write": 30666
+          },
+          "facet_postcard_t0": {
+            "instructions": 2258746,
+            "estimated_cycles": 3656110,
+            "time_median_ns": 212300,
+            "l1_hits": 3638165,
+            "ll_hits": 96,
+            "ram_hits": 499,
+            "total_read_write": 3638760
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 15505,
+            "estimated_cycles": 25315,
+            "time_median_ns": 572.2,
+            "l1_hits": 22410,
+            "ll_hits": 14,
+            "ram_hits": 81,
+            "total_read_write": 22505
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 308953,
+            "estimated_cycles": 465825,
+            "time_median_ns": 23100,
+            "l1_hits": 460000,
+            "ll_hits": 52,
+            "ram_hits": 159,
+            "total_read_write": 460211
+          }
+        }
+      },
+      "postcard::vec_u8_empty": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 479,
+            "estimated_cycles": 1885,
+            "time_median_ns": 8.914,
+            "l1_hits": 685,
+            "ll_hits": 9,
+            "ram_hits": 33,
+            "total_read_write": 727
+          },
+          "facet_postcard_t2": {
+            "instructions": 511,
+            "estimated_cycles": 2488,
+            "time_median_ns": 45.55,
+            "l1_hits": 788,
+            "ll_hits": 4,
+            "ram_hits": 48,
+            "total_read_write": 840
+          },
+          "facet_postcard_t0": {
+            "instructions": 2765,
+            "estimated_cycles": 11806,
+            "time_median_ns": 144.7,
+            "l1_hits": 3971,
+            "ll_hits": 69,
+            "ram_hits": 214,
+            "total_read_write": 4254
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 311,
+            "estimated_cycles": 1163,
+            "time_median_ns": 26.14,
+            "l1_hits": 433,
+            "ll_hits": 6,
+            "ram_hits": 20,
+            "total_read_write": 459
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 732,
+            "estimated_cycles": 4142,
+            "time_median_ns": 47.89,
+            "l1_hits": 1007,
+            "ll_hits": 25,
+            "ram_hits": 86,
+            "total_read_write": 1118
+          }
+        }
+      },
+      "postcard::vec_u8_16": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 1630,
+            "estimated_cycles": 3879,
+            "time_median_ns": 23.6,
+            "l1_hits": 2294,
+            "ll_hits": 16,
+            "ram_hits": 43,
+            "total_read_write": 2353
+          },
+          "facet_postcard_t2": {
+            "instructions": 664,
+            "estimated_cycles": 2701,
+            "time_median_ns": 54.46,
+            "l1_hits": 1006,
+            "ll_hits": 3,
+            "ram_hits": 48,
+            "total_read_write": 1057
+          },
+          "facet_postcard_t0": {
+            "instructions": 41275,
+            "estimated_cycles": 80646,
+            "time_median_ns": 3909,
+            "l1_hits": 65256,
+            "ll_hits": 96,
+            "ram_hits": 426,
+            "total_read_write": 65778
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 1156,
+            "estimated_cycles": 2802,
+            "time_median_ns": 55.39,
+            "l1_hits": 1612,
+            "ll_hits": 14,
+            "ram_hits": 32,
+            "total_read_write": 1658
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 6466,
+            "estimated_cycles": 13383,
+            "time_median_ns": 444.7,
+            "l1_hits": 9353,
+            "ll_hits": 50,
+            "ram_hits": 108,
+            "total_read_write": 9511
+          }
+        }
+      },
+      "postcard::vec_u8_256": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 9170,
+            "estimated_cycles": 15863,
+            "time_median_ns": 157.2,
+            "l1_hits": 13153,
+            "ll_hits": 17,
+            "ram_hits": 75,
+            "total_read_write": 13245
+          },
+          "facet_postcard_t2": {
+            "instructions": 703,
+            "estimated_cycles": 2762,
+            "time_median_ns": 55.39,
+            "l1_hits": 1062,
+            "ll_hits": 4,
+            "ram_hits": 48,
+            "total_read_write": 1114
+          },
+          "facet_postcard_t0": {
+            "instructions": 602691,
+            "estimated_cycles": 982445,
+            "time_median_ns": 59090,
+            "l1_hits": 965775,
+            "ll_hits": 128,
+            "ram_hits": 458,
+            "total_read_write": 966361
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 4942,
+            "estimated_cycles": 9308,
+            "time_median_ns": 241,
+            "l1_hits": 7248,
+            "ll_hits": 13,
+            "ram_hits": 57,
+            "total_read_write": 7318
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 83720,
+            "estimated_cycles": 127939,
+            "time_median_ns": 6019,
+            "l1_hits": 123034,
+            "ll_hits": 50,
+            "ram_hits": 133,
+            "total_read_write": 123217
+          }
+        }
+      },
+      "postcard::vec_u8_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 28774,
+            "estimated_cycles": 45783,
+            "time_median_ns": 517.2,
+            "l1_hits": 41783,
+            "ll_hits": 16,
+            "ram_hits": 112,
+            "total_read_write": 41911
+          },
+          "facet_postcard_t2": {
+            "instructions": 799,
+            "estimated_cycles": 2905,
+            "time_median_ns": 69.77,
+            "l1_hits": 1210,
+            "ll_hits": 3,
+            "ram_hits": 48,
+            "total_read_write": 1261
+          },
+          "facet_postcard_t0": {
+            "instructions": 2337708,
+            "estimated_cycles": 3768128,
+            "time_median_ns": 229500,
+            "l1_hits": 3750103,
+            "ll_hits": 140,
+            "ram_hits": 495,
+            "total_read_write": 3750738
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 13402,
+            "estimated_cycles": 23282,
+            "time_median_ns": 604.7,
+            "l1_hits": 20282,
+            "ll_hits": 12,
+            "ram_hits": 84,
+            "total_read_write": 20378
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 319843,
+            "estimated_cycles": 476793,
+            "time_median_ns": 22980,
+            "l1_hits": 470863,
+            "ll_hits": 52,
+            "ram_hits": 162,
+            "total_read_write": 471077
+          }
+        }
+      },
+      "postcard::vec_u8_64k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 1787628,
+            "estimated_cycles": 2835210,
+            "time_median_ns": 32490.000000000004,
+            "l1_hits": 2703605,
+            "ll_hits": 4229,
+            "ram_hits": 3156,
+            "total_read_write": 2710990
+          },
+          "facet_postcard_t2": {
+            "instructions": 66383,
+            "estimated_cycles": 207906,
+            "time_median_ns": 534.7,
+            "l1_hits": 195711,
+            "ll_hits": 2103,
+            "ram_hits": 48,
+            "total_read_write": 197862
+          },
+          "facet_postcard_t0": {
+            "instructions": 152854091,
+            "estimated_cycles": 245538092,
+            "time_median_ns": 15090000,
+            "l1_hits": 245391442,
+            "ll_hits": 4473,
+            "ram_hits": 3551,
+            "total_read_write": 245399466
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 804228,
+            "estimated_cycles": 1449738,
+            "time_median_ns": 23930,
+            "l1_hits": 1328968,
+            "ll_hits": 2167,
+            "ram_hits": 3141,
+            "total_read_write": 1334276
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 20858710,
+            "estimated_cycles": 30944561,
+            "time_median_ns": 1497000,
+            "l1_hits": 30820766,
+            "ll_hits": 2240,
+            "ram_hits": 3217,
+            "total_read_write": 30826223
+          }
+        }
+      },
+      "postcard::vec_u64_small": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 2414,
+            "estimated_cycles": 4950,
+            "time_median_ns": 34.07,
+            "l1_hits": 3265,
+            "ll_hits": 15,
+            "ram_hits": 46,
+            "total_read_write": 3326
+          },
+          "facet_postcard_t2": {
+            "instructions": 1237,
+            "estimated_cycles": 3381,
+            "time_median_ns": 64.77,
+            "l1_hits": 1681,
+            "ll_hits": 4,
+            "ram_hits": 48,
+            "total_read_write": 1733
+          },
+          "facet_postcard_t0": {
+            "instructions": 28837,
+            "estimated_cycles": 60856,
+            "time_median_ns": 2589,
+            "l1_hits": 44816,
+            "ll_hits": 128,
+            "ram_hits": 440,
+            "total_read_write": 45384
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 1570,
+            "estimated_cycles": 3243,
+            "time_median_ns": 73.83,
+            "l1_hits": 2103,
+            "ll_hits": 11,
+            "ram_hits": 31,
+            "total_read_write": 2145
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 5018,
+            "estimated_cycles": 11620,
+            "time_median_ns": 318.5,
+            "l1_hits": 7260,
+            "ll_hits": 46,
+            "ram_hits": 118,
+            "total_read_write": 7424
+          }
+        }
+      },
+      "postcard::simple_struct": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 963,
+            "estimated_cycles": 2908,
+            "time_median_ns": 21.57,
+            "l1_hits": 1328,
+            "ll_hits": 8,
+            "ram_hits": 44,
+            "total_read_write": 1380
+          },
+          "facet_postcard_t2": {
+            "instructions": 641,
+            "estimated_cycles": 2549,
+            "time_median_ns": 69.77,
+            "l1_hits": 954,
+            "ll_hits": 4,
+            "ram_hits": 45,
+            "total_read_write": 1003
+          },
+          "facet_postcard_t0": {
+            "instructions": 10089,
+            "estimated_cycles": 34087,
+            "time_median_ns": 819.7,
+            "l1_hits": 14937,
+            "ll_hits": 92,
+            "ram_hits": 534,
+            "total_read_write": 15563
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 462,
+            "estimated_cycles": 1625,
+            "time_median_ns": 22.35,
+            "l1_hits": 645,
+            "ll_hits": 7,
+            "ram_hits": 27,
+            "total_read_write": 679
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 3396,
+            "estimated_cycles": 11725,
+            "time_median_ns": 199.7,
+            "l1_hits": 4965,
+            "ll_hits": 43,
+            "ram_hits": 187,
+            "total_read_write": 5195
+          }
+        }
+      },
+      "postcard::nested_struct": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 1257,
+            "estimated_cycles": 3657,
+            "time_median_ns": 23.44,
+            "l1_hits": 1717,
+            "ll_hits": 10,
+            "ram_hits": 54,
+            "total_read_write": 1781
+          },
+          "facet_postcard_t2": {
+            "instructions": 721,
+            "estimated_cycles": 2620,
+            "time_median_ns": 69.77,
+            "l1_hits": 1060,
+            "ll_hits": 4,
+            "ram_hits": 44,
+            "total_read_write": 1108
+          },
+          "facet_postcard_t0": {
+            "instructions": 17150,
+            "estimated_cycles": 49801,
+            "time_median_ns": 1459,
+            "l1_hits": 25751,
+            "ll_hits": 113,
+            "ram_hits": 671,
+            "total_read_write": 26535
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 697,
+            "estimated_cycles": 2218,
+            "time_median_ns": 38.21,
+            "l1_hits": 958,
+            "ll_hits": 7,
+            "ram_hits": 35,
+            "total_read_write": 1000
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 6113,
+            "estimated_cycles": 17289,
+            "time_median_ns": 349.7,
+            "l1_hits": 9079,
+            "ll_hits": 74,
+            "ram_hits": 224,
+            "total_read_write": 9377
+          }
+        }
+      },
+      "postcard::vec_u32_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 111597,
+            "estimated_cycles": 149699,
+            "time_median_ns": 1324,
+            "l1_hits": 141709,
+            "ll_hits": 16,
+            "ram_hits": 226,
+            "total_read_write": 141951
+          },
+          "facet_postcard_t2": {
+            "instructions": 72125,
+            "estimated_cycles": 88053,
+            "time_median_ns": 2519,
+            "l1_hits": 86458,
+            "ll_hits": 4,
+            "ram_hits": 45,
+            "total_read_write": 86507
+          },
+          "facet_postcard_t0": {
+            "instructions": 2468617,
+            "estimated_cycles": 3975833,
+            "time_median_ns": 233200,
+            "l1_hits": 3913158,
+            "ll_hits": 8160,
+            "ram_hits": 625,
+            "total_read_write": 3921943
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 66627,
+            "estimated_cycles": 91291,
+            "time_median_ns": 4359,
+            "l1_hits": 86046,
+            "ll_hits": 13,
+            "ram_hits": 148,
+            "total_read_write": 86207
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 417832,
+            "estimated_cycles": 621740,
+            "time_median_ns": 26460,
+            "l1_hits": 613410,
+            "ll_hits": 56,
+            "ram_hits": 230,
+            "total_read_write": 613696
+          }
+        }
+      },
+      "postcard::vec_u64_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 165193,
+            "estimated_cycles": 224466,
+            "time_median_ns": 2749,
+            "l1_hits": 210871,
+            "ll_hits": 17,
+            "ram_hits": 386,
+            "total_read_write": 211274
+          },
+          "facet_postcard_t2": {
+            "instructions": 96810,
+            "estimated_cycles": 117158,
+            "time_median_ns": 3499,
+            "l1_hits": 115498,
+            "ll_hits": 3,
+            "ram_hits": 47,
+            "total_read_write": 115548
+          },
+          "facet_postcard_t0": {
+            "instructions": 2528555,
+            "estimated_cycles": 4023059,
+            "time_median_ns": 233700,
+            "l1_hits": 3994639,
+            "ll_hits": 224,
+            "ram_hits": 780,
+            "total_read_write": 3995643
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 94523,
+            "estimated_cycles": 127205,
+            "time_median_ns": 4759,
+            "l1_hits": 118670,
+            "ll_hits": 13,
+            "ram_hits": 242,
+            "total_read_write": 118925
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 492662,
+            "estimated_cycles": 726774,
+            "time_median_ns": 28260,
+            "l1_hits": 715194,
+            "ll_hits": 55,
+            "ram_hits": 323,
+            "total_read_write": 715572
+          }
+        }
+      },
+      "postcard::vec_u64_large": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 1268181,
+            "estimated_cycles": 1795607,
+            "time_median_ns": 17740,
+            "l1_hits": 1674102,
+            "ll_hits": 1971,
+            "ram_hits": 3190,
+            "total_read_write": 1679263
+          },
+          "facet_postcard_t2": {
+            "instructions": 827845,
+            "estimated_cycles": 997031,
+            "time_median_ns": 28710,
+            "l1_hits": 985766,
+            "ll_hits": 1924,
+            "ram_hits": 47,
+            "total_read_write": 987737
+          },
+          "facet_postcard_t0": {
+            "instructions": 24863489,
+            "estimated_cycles": 39597808,
+            "time_median_ns": 2305000,
+            "l1_hits": 39461063,
+            "ll_hits": 2282,
+            "ram_hits": 3581,
+            "total_read_write": 39466926
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 649768,
+            "estimated_cycles": 931847,
+            "time_median_ns": 44950,
+            "l1_hits": 857777,
+            "ll_hits": 1332,
+            "ram_hits": 1926,
+            "total_read_write": 861035
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 4383747,
+            "estimated_cycles": 6526454,
+            "time_median_ns": 264900,
+            "l1_hits": 6449184,
+            "ll_hits": 1384,
+            "ram_hits": 2010,
+            "total_read_write": 6452578
+          }
+        }
+      },
+      "postcard::vec_i32_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 108983,
+            "estimated_cycles": 144954,
+            "time_median_ns": 1364,
+            "l1_hits": 136854,
+            "ll_hits": 17,
+            "ram_hits": 229,
+            "total_read_write": 137100
+          },
+          "facet_postcard_t2": {
+            "instructions": 70495,
+            "estimated_cycles": 85285,
+            "time_median_ns": 1909,
+            "l1_hits": 83655,
+            "ll_hits": 4,
+            "ram_hits": 46,
+            "total_read_write": 83705
+          },
+          "facet_postcard_t0": {
+            "instructions": 2503269,
+            "estimated_cycles": 3988422,
+            "time_median_ns": 230300,
+            "l1_hits": 3965507,
+            "ll_hits": 229,
+            "ram_hits": 622,
+            "total_read_write": 3966358
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 63570,
+            "estimated_cycles": 86743,
+            "time_median_ns": 4409,
+            "l1_hits": 81533,
+            "ll_hits": 13,
+            "ram_hits": 147,
+            "total_read_write": 81693
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 398100,
+            "estimated_cycles": 594073,
+            "time_median_ns": 26540,
+            "l1_hits": 585923,
+            "ll_hits": 55,
+            "ram_hits": 225,
+            "total_read_write": 586203
+          }
+        }
+      },
+      "postcard::vec_i64_1k": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 156290,
+            "estimated_cycles": 214939,
+            "time_median_ns": 2099,
+            "l1_hits": 201614,
+            "ll_hits": 19,
+            "ram_hits": 378,
+            "total_read_write": 202011
+          },
+          "facet_postcard_t2": {
+            "instructions": 103543,
+            "estimated_cycles": 124169,
+            "time_median_ns": 2759,
+            "l1_hits": 122534,
+            "ll_hits": 5,
+            "ram_hits": 46,
+            "total_read_write": 122585
+          },
+          "facet_postcard_t0": {
+            "instructions": 2555651,
+            "estimated_cycles": 4061449,
+            "time_median_ns": 230400,
+            "l1_hits": 4033409,
+            "ll_hits": 197,
+            "ram_hits": 773,
+            "total_read_write": 4034379
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 79496,
+            "estimated_cycles": 111414,
+            "time_median_ns": 4919,
+            "l1_hits": 103084,
+            "ll_hits": 14,
+            "ram_hits": 236,
+            "total_read_write": 103334
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 480287,
+            "estimated_cycles": 715009,
+            "time_median_ns": 28660,
+            "l1_hits": 703849,
+            "ll_hits": 55,
+            "ram_hits": 311,
+            "total_read_write": 704215
+          }
+        }
+      },
+      "postcard::wide_struct": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 5067,
+            "estimated_cycles": 11235,
+            "time_median_ns": 136.6,
+            "l1_hits": 6915,
+            "ll_hits": 17,
+            "ram_hits": 121,
+            "total_read_write": 7053
+          },
+          "facet_postcard_t2": {
+            "instructions": 1625,
+            "estimated_cycles": 4070,
+            "time_median_ns": 119.7,
+            "l1_hits": 2255,
+            "ll_hits": 6,
+            "ram_hits": 51,
+            "total_read_write": 2312
+          },
+          "facet_postcard_t0": {
+            "instructions": 49514,
+            "estimated_cycles": 97923,
+            "time_median_ns": 4394,
+            "l1_hits": 76563,
+            "ll_hits": 121,
+            "ram_hits": 593,
+            "total_read_write": 77277
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 2680,
+            "estimated_cycles": 6310,
+            "time_median_ns": 81.96,
+            "l1_hits": 3630,
+            "ll_hits": 11,
+            "ram_hits": 75,
+            "total_read_write": 3716
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 16572,
+            "estimated_cycles": 36002,
+            "time_median_ns": 1089,
+            "l1_hits": 25162,
+            "ll_hits": 68,
+            "ram_hits": 300,
+            "total_read_write": 25530
+          }
+        }
+      },
+      "postcard::vec_simple_struct": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 121638,
+            "estimated_cycles": 180568,
+            "time_median_ns": 2619,
+            "l1_hits": 169368,
+            "ll_hits": 21,
+            "ram_hits": 317,
+            "total_read_write": 169706
+          },
+          "facet_postcard_t2": {
+            "instructions": 50547,
+            "estimated_cycles": 69883,
+            "time_median_ns": 2289,
+            "l1_hits": 68263,
+            "ll_hits": 16,
+            "ram_hits": 44,
+            "total_read_write": 68323
+          },
+          "facet_postcard_t0": {
+            "instructions": 982254,
+            "estimated_cycles": 1607648,
+            "time_median_ns": 86720,
+            "l1_hits": 1519273,
+            "ll_hits": 10542,
+            "ram_hits": 1019,
+            "total_read_write": 1530834
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 75324,
+            "estimated_cycles": 114192,
+            "time_median_ns": 849.7,
+            "l1_hits": 107462,
+            "ll_hits": 16,
+            "ram_hits": 190,
+            "total_read_write": 107668
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 346915,
+            "estimated_cycles": 544666,
+            "time_median_ns": 17750,
+            "l1_hits": 530881,
+            "ll_hits": 90,
+            "ram_hits": 381,
+            "total_read_write": 531352
+          }
+        }
+      },
+      "postcard::vec_string_short": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 1370990,
+            "estimated_cycles": 1989527,
+            "time_median_ns": 28250,
+            "l1_hits": 1912892,
+            "ll_hits": 1096,
+            "ram_hits": 2033,
+            "total_read_write": 1916021
+          },
+          "facet_postcard_t2": {
+            "instructions": 547824,
+            "estimated_cycles": 742199,
+            "time_median_ns": 30280,
+            "l1_hits": 733889,
+            "ll_hits": 1319,
+            "ram_hits": 49,
+            "total_read_write": 735257
+          },
+          "facet_postcard_t0": {
+            "instructions": 3570207,
+            "estimated_cycles": 5556094,
+            "time_median_ns": 239500,
+            "l1_hits": 5461794,
+            "ll_hits": 1584,
+            "ram_hits": 2468,
+            "total_read_write": 5465846
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 953669,
+            "estimated_cycles": 1412840,
+            "time_median_ns": 4069,
+            "l1_hits": 1368500,
+            "ll_hits": 902,
+            "ram_hits": 1138,
+            "total_read_write": 1370540
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 1302114,
+            "estimated_cycles": 1945660,
+            "time_median_ns": 28400,
+            "l1_hits": 1898060,
+            "ll_hits": 952,
+            "ram_hits": 1224,
+            "total_read_write": 1900236
+          }
+        }
+      },
+      "postcard::vec_string_long": {
+        "deserialize": {
+          "postcard": {
+            "instructions": 258137,
+            "estimated_cycles": 543112,
+            "time_median_ns": 4654,
+            "l1_hits": 350282,
+            "ll_hits": 3328,
+            "ram_hits": 5034,
+            "total_read_write": 358644
+          },
+          "facet_postcard_t2": {
+            "instructions": 123653,
+            "estimated_cycles": 177719,
+            "time_median_ns": 4979,
+            "l1_hits": 159519,
+            "ll_hits": 3297,
+            "ram_hits": 49,
+            "total_read_write": 162865
+          },
+          "facet_postcard_t0": {
+            "instructions": 481769,
+            "estimated_cycles": 912604,
+            "time_median_ns": 26410,
+            "l1_hits": 707639,
+            "ll_hits": 3466,
+            "ram_hits": 5361,
+            "total_read_write": 716466
+          }
+        },
+        "serialize": {
+          "postcard": {
+            "instructions": 161184,
+            "estimated_cycles": 351613,
+            "time_median_ns": 2739,
+            "l1_hits": 224678,
+            "ll_hits": 1720,
+            "ram_hits": 3381,
+            "total_read_write": 229779
+          },
+          "facet_postcard_t2": null,
+          "facet_postcard_t0": {
+            "instructions": 199476,
+            "estimated_cycles": 409124,
+            "time_median_ns": 5189,
+            "l1_hits": 282744,
+            "ll_hits": 1707,
+            "ram_hits": 3367,
+            "total_read_write": 287818
+          }
+        }
+      }
+    },
+    "errors": {}
+  }
+}
